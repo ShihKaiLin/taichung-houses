@@ -2,7 +2,7 @@ import os, csv, requests, html, shutil
 from pathlib import Path
 
 # --- 核心配置 ---
-SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQne8IK7y_pwL0rqXJ0zZIa5qZyj1fly4SZu13FmSipcVORrdBP9at1tQQY18-v290vN6mUhy_TizCS/pub?output=csv"
+SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQShAl0-TbUU0MQdYVe53im2T6lXQgh_7g-bdL6HHpIBFtA2yfIAMbPw4J9RgZUkROb9AAiMhnRC0kH/pub?output=csv"
 MY_PHONE = "0938-615-351"
 MY_LINE_URL = "https://line.me/ti/p/FDsMyAYDv"
 SITE_TITLE = "台中房產雲端看板"
@@ -63,3 +63,4 @@ def build():
     print("✅ 網站更新成功！")
 
 if __name__ == "__main__": build()
+

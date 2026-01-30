@@ -2,7 +2,6 @@ import os, csv, requests, html, shutil
 from pathlib import Path
 
 # --- 核心配置 ---
-# 請確認這是您「發佈到網路」後取得的 CSV 網址
 SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQne8IK7y_pwL0rqXJ0zZIa5qZyj1fly4SZu13FmSipcVORrdBP9at1tQQY18-v290vN6mUhy_TizCS/pub?output=csv"
 MY_PHONE = "0938-615-351"
 MY_LINE_URL = "https://line.me/ti/p/FDsMyAYDv"
@@ -15,50 +14,52 @@ def build():
     if out.exists(): shutil.rmtree(out)
     out.mkdir()
 
-    # 抓取資料
+    # 抓取並解碼資料
     res = requests.get(SHEET_CSV_URL)
     res.encoding = 'utf-8'
     
-    # 確保抓到標題列並過濾空行
-    lines = [line for line in res.text.splitlines() if line.strip()]
+    # 強力過濾：移除所有空白行，並清除每行兩端的隱藏字元
+    lines = [line.strip() for line in res.text.splitlines() if line.strip()]
+    
+    # 讀取 CSV
     reader = csv.DictReader(lines)
 
     items = []
     for i, row in enumerate(reader):
-        # 清除欄位名稱兩端的空格
-        row = {k.strip(): v for k, v in row.items() if k}
+        # 終極過濾：清除標題與內容的所有隱藏空格
+        clean_row = {str(k).strip(): str(v).strip() for k, v in row.items() if k}
         
-        # 只抓取狀態為 ON 的物件
-        if row.get("狀態") != "ON": continue
+        # 只抓取狀態為 ON 的物件 (您的表格目前已統一為 ON)
+        if clean_row.get("狀態") != "ON": continue
 
-        name = row.get("案名", "未命名物件")
-        area = row.get("區域", "台中")
-        price = row.get("價格", "面議")
-        desc = row.get("描述", "")
-        img_url = row.get("圖片網址", "")
+        name = clean_row.get("案名", "未命名物件")
+        area = clean_row.get("區域", "台中")
+        price = clean_row.get("價格", "面議")
+        desc = clean_row.get("描述", "")
+        img_url = clean_row.get("圖片網址", "")
 
         slug = f"p{i}"
         (out/slug).mkdir()
         
-        # 簡單好看的物件頁面樣板
-        body_html = f"""
-        <div style='padding:20px; font-family:sans-serif;'>
+        # 房仲專用物件頁樣板
+        body_content = f"""
+        <div style='padding:20px; font-family:sans-serif; max-width:600px; margin:auto; background:#fff;'>
             {f'<img src="{img_url}" style="width:100%; border-radius:10px;">' if "http" in img_url else ""}
-            <h1 style='color:#333;'>{esc(name)}</h1>
+            <h1 style='color:#333; font-size:22px;'>{esc(name)}</h1>
             <p style='color:#e67e22; font-size:24px; font-weight:bold;'>{esc(price)}</p>
-            <p style='background:#f9f9f9; padding:15px; line-height:1.6;'>{esc(desc)}</p>
-            <div style='margin-top:30px;'>
-                <a href="tel:{MY_PHONE}" style="display:block; background:#e67e22; color:#fff; text-align:center; padding:15px; text-decoration:none; border-radius:50px; margin-bottom:10px;">撥打電話</a>
-                <a href="{MY_LINE_URL}" style="display:block; background:#00b900; color:#fff; text-align:center; padding:15px; text-decoration:none; border-radius:50px;">LINE 諮詢</a>
+            <div style='background:#f9f9f9; padding:15px; border-radius:8px; line-height:1.7; color:#555;'>{esc(desc)}</div>
+            <div style='margin-top:30px; display:flex; gap:10px;'>
+                <a href="tel:{MY_PHONE}" style="flex:1; background:#e67e22; color:#fff; text-align:center; padding:15px; text-decoration:none; border-radius:50px; font-weight:bold;">撥打電話</a>
+                <a href="{MY_LINE_URL}" style="flex:1; background:#00b900; color:#fff; text-align:center; padding:15px; text-decoration:none; border-radius:50px; font-weight:bold;">LINE 諮詢</a>
             </div>
         </div>
         """
-        (out/slug/"index.html").write_text(f"<!doctype html><html><head><meta name='viewport' content='width=device-width,initial-scale=1'></head><body style='margin:0; background:#f0f2f5;'>{body_html}</body></html>", encoding="utf-8")
-        items.append(f"<li style='margin-bottom:15px; list-style:none; background:#fff; padding:15px; border-radius:10px;'><a href='./{slug}/' style='text-decoration:none; color:#333; font-weight:bold;'>[{esc(area)}] {esc(name)} - {esc(price)}</a></li>")
+        (out/slug/"index.html").write_text(f"<!doctype html><html><head><meta name='viewport' content='width=device-width,initial-scale=1'></head><body style='margin:0; background:#f0f2f5;'>{body_content}</body></html>", encoding="utf-8")
+        items.append(f"<li style='margin-bottom:15px; list-style:none; background:#fff; padding:15px; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.05);'><a href='./{slug}/' style='text-decoration:none; color:#333; display:block;'><b>[{esc(area)}] {esc(name)}</b><br><span style='color:#e67e22;'>{esc(price)}</span></a></li>")
 
-    # 生成首頁
-    home_html = f"<div style='padding:20px; font-family:sans-serif;'><h1>🏠 {SITE_TITLE}</h1><ul style='padding:0;'>{''.join(items)}</ul></div>"
-    (out/"index.html").write_text(f"<!doctype html><html><head><meta name='viewport' content='width=device-width,initial-scale=1'></head><body style='margin:0; background:#f0f2f5;'>{home_html}</body></html>", encoding="utf-8")
-    print("✅ 網頁生成完畢")
+    # 生成列表首頁
+    home_content = f"<div style='padding:20px; font-family:sans-serif; max-width:600px; margin:auto;'><h2>🏠 {SITE_TITLE}</h2><ul style='padding:0;'>{''.join(items)}</ul></div>"
+    (out/"index.html").write_text(f"<!doctype html><html><head><meta name='viewport' content='width=device-width,initial-scale=1'></head><body style='margin:0; background:#f0f2f5;'>{home_content}</body></html>", encoding="utf-8")
+    print("✅ 網站更新成功！")
 
 if __name__ == "__main__": build()

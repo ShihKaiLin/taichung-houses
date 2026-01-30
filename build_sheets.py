@@ -56,7 +56,7 @@ def get_head(title, desc, img, url):
     """
 
 def build():
-    out = Path("site")
+    out = Path(".")
     if out.exists(): shutil.rmtree(out)
     for d in ["area", "sell"]: (out/d).mkdir(parents=True)
 
@@ -130,3 +130,4 @@ def build():
     print("✅ 全功能旗艦版建置完成！")
 
 if __name__ == "__main__": build()
+

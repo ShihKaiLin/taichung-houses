@@ -1,0 +1,23 @@
+name: Cloud Sync Deploy
+on:
+  schedule:
+    - cron: '0 * * * *' # 每整點自動執行
+  workflow_dispatch:      # 允許手動點擊執行
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Build Site
+        run: python build_sheets.py
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site

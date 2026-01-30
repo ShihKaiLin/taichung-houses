@@ -1,11 +1,13 @@
 import os, csv, requests, html, shutil
 from pathlib import Path
+from datetime import datetime
 
-# --- 核心配置：使用您提供的最新網址 ---
+# --- 核心配置 ---
 SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQShAl0-TbUU0MQdYVe53im2T6lXQgh_7g-bdL6HHpIBFtA2yfIAMbPw4J9RgZUkROb9AAiMhnRC0kH/pub?output=csv"
 MY_PHONE = "0938-615-351"
 MY_LINE_URL = "https://line.me/ti/p/FDsMyAYDv"
-SITE_TITLE = "台中房產雲端看板 v2"
+SITE_TITLE = "台中房產雲端看板"
+BASE_URL = "https://shihkailin.github.io/taichung-houses" # 用於 SEO Sitemap
 
 def esc(s): return html.escape(str(s or "").strip())
 
@@ -14,22 +16,18 @@ def build():
     if out.exists(): shutil.rmtree(out)
     out.mkdir()
 
-    print("🚀 正在連線並自動清洗資料...")
+    print("🚀 啟動旗艦版 SEO 建置引擎...")
     res = requests.get(SHEET_CSV_URL)
-    res.encoding = 'utf-8-sig' # 處理 Google 表格隱藏字元
-    
-    # 過濾空白行
+    res.encoding = 'utf-8-sig'
     lines = [line.strip() for line in res.text.splitlines() if line.strip()]
     reader = csv.DictReader(lines)
 
     items = []
+    sitemap_urls = [f"{BASE_URL}/"]
+
     for i, row in enumerate(reader):
-        # 終極對齊：自動移除欄位名稱兩端的所有空格或特殊字元
         clean_row = {str(k).strip().replace('\ufeff', ''): str(v).strip() for k, v in row.items() if k}
-        
-        # 只抓取狀態為 ON 的物件
-        if clean_row.get("狀態") != "ON":
-            continue
+        if clean_row.get("狀態") != "ON": continue
 
         name = clean_row.get("案名", "精選物件")
         area = clean_row.get("區域", "台中")
@@ -37,32 +35,101 @@ def build():
         desc = clean_row.get("描述", "")
         img_url = clean_row.get("圖片網址", "")
         address = clean_row.get("地址", "")
-
+        
+        # SEO 強化：自動組合關鍵字標題
+        seo_title = f"[{area}] {name} - {price} | {SITE_TITLE}"
+        keywords = f"{area}買屋, {name}, {address}, 台中房地產, 實價登錄, {price}"
         slug = f"p{i}"
         (out/slug).mkdir()
-        
-        # 生成物件詳細頁 (iOS 優化版)
-        page_html = f"""
-        <div style='padding:20px; font-family:sans-serif; max-width:500px; margin:auto; background:#fff;'>
-            {f'<img src="{img_url}" style="width:100%; border-radius:10px;">' if "http" in img_url else '<div style="background:#eee; height:200px; border-radius:10px; text-align:center; line-height:200px; color:#aaa;">預覽圖</div>'}
-            <h1 style='font-size:22px; margin-top:15px;'>{esc(name)}</h1>
-            <p style='color:#e67e22; font-size:24px; font-weight:bold;'>{esc(price)}</p>
-            <p style='color:#777;'>📍 {esc(area)} | {esc(address)}</p>
-            <div style='line-height:1.6; color:#444; background:#f9f9f9; padding:15px; border-radius:10px;'>{esc(desc)}</div>
-            <div style='margin-top:30px; display:flex; gap:10px;'>
-                <a href="tel:{MY_PHONE}" style="flex:1; background:#e67e22; color:#fff; text-align:center; padding:15px; text-decoration:none; border-radius:50px; font-weight:bold;">📞 撥打電話</a>
-                <a href="{MY_LINE_URL}" style="flex:1; background:#00b900; color:#fff; text-align:center; padding:15px; text-decoration:none; border-radius:50px; font-weight:bold;">💬 LINE 諮詢</a>
+        sitemap_urls.append(f"{BASE_URL}/{slug}/")
+
+        # 物件詳細頁 (旗艦版 UI)
+        page_content = f"""
+        <div class="card">
+            <div class="img-container">
+                {f'<img src="{img_url}" alt="{name}">' if "http" in img_url else '<div class="no-img">📸 預覽圖製作中</div>'}
+            </div>
+            <div class="content">
+                <span class="badge">{esc(area)}</span>
+                <h1>{esc(name)}</h1>
+                <p class="price">{esc(price)}</p>
+                <p class="address">📍 {esc(address)}</p>
+                <div class="desc-box">
+                    <strong>🏠 物件特色：</strong><br>
+                    {esc(desc).replace('、', '<br>• ')}
+                </div>
+                <div class="btn-group">
+                    <a href="tel:{MY_PHONE}" class="btn tel">📞 立即撥通</a>
+                    <a href="{MY_LINE_URL}" class="btn line">💬 LINE 諮詢</a>
+                </div>
+                <div class="seo-footer">相關搜尋：{keywords}</div>
             </div>
         </div>
         """
-        (out/slug/"index.html").write_text(f"<!doctype html><html><head><meta name='viewport' content='width=device-width,initial-scale=1'></head><body style='margin:0; background:#f5f5f5;'>{page_html}</body></html>", encoding="utf-8")
-        items.append(f"<li style='margin-bottom:15px; list-style:none; background:#fff; padding:15px; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.1);'><a href='./{slug}/' style='text-decoration:none; color:#333; display:block;'><b>[{esc(area)}] {esc(name)}</b><br><span style='color:#e67e22;'>{esc(price)}</span></a></li>")
+        
+        full_page = f"""<!doctype html><html><head>
+            <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+            <title>{seo_title}</title>
+            <meta name="description" content="{esc(desc)[:100]}">
+            <meta name="keywords" content="{keywords}">
+            <style>
+                body {{ font-family: -apple-system, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }}
+                .card {{ max-width: 500px; margin: auto; background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }}
+                .img-container img {{ width: 100%; display: block; }}
+                .no-img {{ height: 250px; background: #eee; display: flex; align-items: center; justify-content: center; color: #999; }}
+                .content {{ padding: 25px; }}
+                .badge {{ background: #e8f0fe; color: #1a73e8; padding: 5px 12px; border-radius: 50px; font-weight: bold; font-size: 14px; }}
+                h1 {{ font-size: 22px; margin: 15px 0 10px; color: #1c1e21; }}
+                .price {{ color: #d93025; font-size: 28px; font-weight: 800; margin-bottom: 10px; }}
+                .address {{ color: #5f6368; font-size: 15px; margin-bottom: 20px; }}
+                .desc-box {{ background: #f8f9fa; padding: 15px; border-radius: 12px; line-height: 1.6; color: #4b4b4b; }}
+                .btn-group {{ display: flex; gap: 12px; margin-top: 25px; }}
+                .btn {{ flex: 1; text-align: center; padding: 16px; border-radius: 50px; text-decoration: none; font-weight: bold; transition: 0.3s; }}
+                .tel {{ background: #f2994a; color: white; }}
+                .line {{ background: #27ae60; color: white; }}
+                .seo-footer {{ margin-top: 30px; font-size: 12px; color: #ccc; }}
+            </style>
+        </head><body>{page_content}</body></html>"""
+        
+        (out/slug/"index.html").write_text(full_page, encoding="utf-8")
+        items.append(f"""
+            <a href="./{slug}/" class="item-card">
+                <div class="item-info">
+                    <span class="item-area">[{esc(area)}]</span>
+                    <div class="item-name">{esc(name)}</div>
+                    <div class="item-price">{esc(price)}</div>
+                </div>
+            </a>
+        """)
 
     # 生成首頁
-    home_html = f"<div style='padding:20px; font-family:sans-serif; max-width:500px; margin:auto;'><h2>🏠 {SITE_TITLE}</h2><ul style='padding:0;'>{''.join(items)}</ul></div>"
-    (out/"index.html").write_text(f"<!doctype html><html><head><meta name='viewport' content='width=device-width,initial-scale=1'></head><body style='margin:0; background:#f5f5f5;'>{home_html}</body></html>", encoding="utf-8")
-    print(f"✅ 成功生成了 {len(items)} 個物件！")
+    home_html = f"""
+    <!doctype html><html><head>
+    <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>{SITE_TITLE} - 台中買屋賣屋推薦</title>
+    <style>
+        body {{ background: #f8fafc; font-family: sans-serif; padding: 20px; }}
+        .header {{ text-align: center; margin-bottom: 30px; }}
+        .list {{ max-width: 600px; margin: auto; }}
+        .item-card {{ display: block; background: white; margin-bottom: 15px; padding: 20px; border-radius: 15px; text-decoration: none; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 6px solid #f2994a; }}
+        .item-area {{ color: #999; font-size: 13px; }}
+        .item-name {{ font-size: 18px; color: #333; font-weight: bold; margin: 5px 0; }}
+        .item-price {{ color: #d93025; font-size: 20px; font-weight: 800; }}
+    </style>
+    </head><body>
+    <div class="header"><h1>🏠 {SITE_TITLE}</h1><p>世塏精選 · 台中好房</p></div>
+    <div class="list">{"".join(items)}</div>
+    </body></html>
+    """
+    (out/"index.html").write_text(home_html, encoding="utf-8")
+
+    # --- 生成自動化 Sitemap ---
+    sitemap = f'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+    for url in sitemap_urls:
+        sitemap += f'<url><loc>{url}</loc><lastmod>{datetime.now().strftime("%Y-%m-%d")}</lastmod></url>'
+    sitemap += '</urlset>'
+    (out/"sitemap.xml").write_text(sitemap, encoding="utf-8")
+    
+    print(f"✅ 旗艦版建置完成！共生成 {len(items)} 個 SEO 頁面。")
 
 if __name__ == "__main__": build()
-
-

@@ -5,8 +5,7 @@ from pathlib import Path
 # 配置區：請填入你的資料
 # =========================================================
 # 填入你從 Google Sheets 發佈後取得的 CSV 網址
-SHEET_CSV_URL = https://docs.google.com/spreadsheets/d/e/2PACX-1vQne8IK7y_pwL0rqXJ0zZIa5qZyj1fly4SZu13FmSipcVORrdBP9at1tQQY18-v290vN6mUhy_TizCS/pub?output=csv
-
+SHEET_CSV_URL ="https://docs.google.com/spreadsheets/d/e/2PACX-1vQne8IK7y_pwL0rqXJ0zZIa5qZyj1fly4SZu13FmSipcVORrdBP9at1tQQY18-v290vN6mUhy_TizCS/pub?output=csv"
 # 聯絡資訊
 MY_PHONE = "0938-615-351" 
 MY_LINE_URL = "https://line.me/ti/p/FDsMyAYDv"
@@ -98,3 +97,4 @@ def build():
 
 
 if __name__ == "__main__": build()
+

@@ -14,24 +14,23 @@ def build():
     if out.exists(): shutil.rmtree(out)
     out.mkdir()
 
-    print("🚀 正在從雲端抓取房產資料...")
+    print("🚀 正在連線並自動清洗資料...")
     res = requests.get(SHEET_CSV_URL)
-    res.encoding = 'utf-8-sig'
+    res.encoding = 'utf-8-sig' # 處理 Google 表格隱藏字元
     
-    # 過濾掉空白行並清理字元
+    # 過濾空白行
     lines = [line.strip() for line in res.text.splitlines() if line.strip()]
     reader = csv.DictReader(lines)
 
     items = []
     for i, row in enumerate(reader):
-        # 自動清理欄位名稱的隱藏空白（這是之前出錯的主因）
-        clean_row = {str(k).strip(): str(v).strip() for k, v in row.items() if k}
+        # 終極對齊：自動移除欄位名稱兩端的所有空格或特殊字元
+        clean_row = {str(k).strip().replace('\ufeff', ''): str(v).strip() for k, v in row.items() if k}
         
         # 只抓取狀態為 ON 的物件
         if clean_row.get("狀態") != "ON":
             continue
 
-        # 根據您的截圖欄位進行對接
         name = clean_row.get("案名", "精選物件")
         area = clean_row.get("區域", "台中")
         price = clean_row.get("價格", "面議")
@@ -42,15 +41,14 @@ def build():
         slug = f"p{i}"
         (out/slug).mkdir()
         
-        # 製作精美的物件頁面
+        # 生成物件詳細頁 (iOS 優化版)
         page_html = f"""
         <div style='padding:20px; font-family:sans-serif; max-width:500px; margin:auto; background:#fff;'>
-            {f'<img src="{img_url}" style="width:100%; border-radius:10px;">' if "http" in img_url else '<div style="background:#eee; height:200px; border-radius:10px; text-align:center; line-height:200px; color:#aaa;">暫無圖片</div>'}
+            {f'<img src="{img_url}" style="width:100%; border-radius:10px;">' if "http" in img_url else '<div style="background:#eee; height:200px; border-radius:10px; text-align:center; line-height:200px; color:#aaa;">預覽圖</div>'}
             <h1 style='font-size:22px; margin-top:15px;'>{esc(name)}</h1>
             <p style='color:#e67e22; font-size:24px; font-weight:bold;'>{esc(price)}</p>
             <p style='color:#777;'>📍 {esc(area)} | {esc(address)}</p>
-            <hr style='border:0; border-top:1px solid #eee;'>
-            <div style='line-height:1.6; color:#444;'>{esc(desc)}</div>
+            <div style='line-height:1.6; color:#444; background:#f9f9f9; padding:15px; border-radius:10px;'>{esc(desc)}</div>
             <div style='margin-top:30px; display:flex; gap:10px;'>
                 <a href="tel:{MY_PHONE}" style="flex:1; background:#e67e22; color:#fff; text-align:center; padding:15px; text-decoration:none; border-radius:50px; font-weight:bold;">📞 撥打電話</a>
                 <a href="{MY_LINE_URL}" style="flex:1; background:#00b900; color:#fff; text-align:center; padding:15px; text-decoration:none; border-radius:50px; font-weight:bold;">💬 LINE 諮詢</a>

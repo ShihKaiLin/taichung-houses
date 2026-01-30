@@ -5,7 +5,7 @@ from pathlib import Path
 SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQShAl0-TbUU0MQdYVe53im2T6lXQgh_7g-bdL6HHpIBFtA2yfIAMbPw4J9RgZUkROb9AAiMhnRC0kH/pub?output=csv"
 MY_PHONE = "0938-615-351"
 MY_LINE_URL = "https://line.me/ti/p/FDsMyAYDv"
-SITE_TITLE = "台中房屋雲端看板"
+SITE_TITLE = "台中房產雲端看板 v2"
 
 def esc(s): return html.escape(str(s or "").strip())
 
@@ -64,4 +64,5 @@ def build():
     print(f"✅ 成功生成了 {len(items)} 個物件！")
 
 if __name__ == "__main__": build()
+
 

@@ -96,4 +96,5 @@ def build():
     (out/"index.html").write_text(render_base(SITE_TITLE, "台中物件清單", home_body), encoding="utf-8")
     print("✅ 雲端網站更新完成！")
 
+
 if __name__ == "__main__": build()

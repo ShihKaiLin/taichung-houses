@@ -14,19 +14,18 @@ GA4_ID = "" # 若有 GA4 ID 請填入
 def esc(s): return html.escape(str(s or "").strip())
 
 def get_final_img_url(url):
-    """【關鍵修正】支援 GitHub 本地圖床與 Google Drive 自動轉換"""
+    """【自動導航】這段要貼在 build_sheets.py 裡面"""
     url = str(url).strip()
     if not url: return "https://placehold.co/600x400?text=無圖片"
     
-    # 支援 Google Drive 自動轉換
-    if "drive.google.com" in url:
-        match = re.search(r'[-\w]{25,45}', url)
-        if match:
-            return f"https://drive.google.com/uc?export=view&id={match.group()}"
-    
-    # 支援 GitHub 相對路徑 (如果您在試算表只寫 images/shalu01.jpg)
+    # 如果填的是以 images/ 開頭的檔名，自動轉成 GitHub 讀得到的完整網址
     if url.startswith("images/"):
         return f"https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/{url}"
+    
+    # 原本的 Google Drive 轉換邏輯也保留，雙管齊下
+    if "drive.google.com" in url:
+        match = re.search(r'[-\w]{25,45}', url)
+        if match: return f"https://drive.google.com/uc?export=view&id={match.group()}"
         
     return url
 
@@ -140,3 +139,4 @@ def build():
     print(f"✅ 部署完成！")
 
 if __name__ == "__main__": build()
+

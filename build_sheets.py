@@ -10,9 +10,9 @@ GA4_ID = "G-B7WP9BTP8X"
 MAPS_API_KEY = "AIzaSyDzgnI2Ucv622CRkWwo2GE5JRrs_Y4HQY0"
 GITHUB_IMG_BASE = "https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/"
 
-# --- 2. 質感合規資訊 ---
+# --- 2. 質感合規資訊 (不明顯但存在) ---
 LEGAL_FOOTER = """
-<div style="margin: 80px 0 40px; padding: 20px; text-align: center; border-top: 1px solid #f9f9f9;">
+<div style="margin: 100px 0 40px; padding: 20px; text-align: center; border-top: 1px solid #f9f9f9;">
     <div style="font-size: 10px; color: #ddd; line-height: 1.6; letter-spacing: 0.5px;">
         英柏國際地產有限公司 | 中市地價二字第 1070029259 號<br>
         王一媖 經紀人 (103) 中市經紀字第 00678 號<br>
@@ -93,6 +93,7 @@ def get_head(title, ga_id, is_home=False, map_data=None):
             .hero::after {{ content:''; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.3); }}
             .hero-content {{ position: relative; z-index: 2; text-align: center; }}
             .hero-content h2 {{ font-size: 32px; margin: 0; letter-spacing: 5px; font-weight: 900; }}
+            .hero-content p {{ font-size: 11px; margin-top: 10px; letter-spacing: 4px; text-transform: uppercase; opacity: 0.9; }}
             .map-box {{ margin: -40px 20px 0; position: relative; z-index: 10; }}
             #map {{ height: 280px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.1); border: 5px solid #fff; }}
             .filter-section {{ padding: 35px 20px 10px; }}
@@ -104,10 +105,11 @@ def get_head(title, ga_id, is_home=False, map_data=None):
             .property-card img {{ width: 100%; height: 280px; object-fit: cover; display: block; }}
             .card-info {{ padding: 25px; }}
             .price {{ font-size: 22px; color: var(--sk-gold); font-weight: 900; }}
-            .action-bar {{ position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 500px; padding: 15px 20px 35px; display: flex; gap: 12px; background: rgba(255,255,255,0.85); backdrop-filter: blur(15px); border-top: 1px solid #f1f1f1; z-index: 999; }}
+            .action-bar {{ position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 500px; padding: 15px 25px 40px; display: flex; gap: 12px; background: rgba(255,255,255,0.85); backdrop-filter: blur(15px); border-top: 1px solid #f1f1f1; z-index: 999; }}
             .btn {{ flex: 1; text-align: center; padding: 18px; border-radius: 18px; text-decoration: none; font-weight: 800; color: #fff; font-size: 15px; }}
             .btn-call {{ background: #1A202C; }} .btn-line {{ background: #00B900; }}
             .back-btn {{ position: absolute; top: 25px; left: 25px; background: #fff; padding: 10px 20px; border-radius: 14px; text-decoration: none; font-weight: 800; color: var(--sk-navy); z-index: 100; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }}
+            .btn-ext {{ display: block; text-align: center; padding: 15px; border: 1.5px solid var(--sk-navy); color: var(--sk-navy); text-decoration: none; border-radius: 12px; margin-top: 15px; font-weight: 700; font-size: 14px; }}
         </style>
     </head>
     """
@@ -139,7 +141,8 @@ def build():
         final_url = ext_url if ext_url.startswith("http") else f"./{slug}/"
         map_data.append({"name": name, "address": loc_text, "url": final_url})
 
-        # 子網頁生成
+        # 詳情頁生成 (包含外部按鈕)
+        ext_btn = f'<a href="{ext_url}" target="_blank" class="btn-ext">🌐 查看完整物件網頁</a>' if ext_url.startswith("http") else ""
         detail_html = f"""
         <div class="container">
             <a href="../" class="back-btn">← 返回</a>
@@ -148,7 +151,8 @@ def build():
                 <h1 style="font-size:28px; font-weight:800; color:var(--sk-navy); margin:0;">{esc(name)}</h1>
                 <div class="price">{esc(price_str)}</div>
                 <div style="line-height:2.1; color:#4a5568; margin-top:25px; font-size:16px;">{esc(row.get("描述","")).replace('、','<br>• ')}</div>
-                <a href="https://www.google.com/maps/search/?api=1&query={urllib.parse.quote(loc_text)}" target="_blank" style="display:block; text-align:center; padding:18px; background:var(--sk-navy); color:#fff; text-decoration:none; border-radius:15px; margin-top:30px; font-weight:700;">📍 前往地圖導航</a>
+                {ext_btn}
+                <a href="https://www.google.com/maps/search/?api=1&query={urllib.parse.quote(loc_text)}" target="_blank" style="display:block; text-align:center; padding:18px; background:var(--sk-navy); color:#fff; text-decoration:none; border-radius:15px; margin-top:15px; font-weight:700;">📍 前往地圖導航</a>
                 {LEGAL_FOOTER}
             </div>
             <div class="action-bar"><a href="tel:{MY_PHONE}" class="btn btn-call">致電 SK-L</a><a href="{MY_LINE_URL}" class="btn btn-line">LINE 諮詢</a></div>
@@ -169,6 +173,7 @@ def build():
             </div>
         ''')
 
+    # 生成分類按鈕
     reg_btns = ''.join([f'<button class="tag f-reg" data-val="{esc(r)}" onclick="setTag(this, \'f-reg\')">{esc(r)}</button>' for r in sorted(regions)])
     type_btns = ''.join([f'<button class="tag f-type" data-val="{esc(t)}" onclick="setTag(this, \'f-type\')">{esc(t)}</button>' for t in sorted(types)])
 

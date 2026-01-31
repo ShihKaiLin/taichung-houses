@@ -1,91 +1,117 @@
 import os, csv, requests, html, shutil, re, urllib.parse
 from pathlib import Path
 
-# --- 1. 核心配置區 ---
+# --- 1. 個人品牌配置區 ---
 SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQShAl0-TbUU0MQdYVe53im2T6lXQgh_7g-bdL6HHpIBFtA2yfIAMbPw4J9RgZUkROb9AAiMhnRC0kH/pub?output=csv"
 MY_PHONE = "0938-615-351"
 MY_LINE_URL = "https://line.me/ti/p/FDsMyAYDv"
-SITE_TITLE = "SK林大台中房地產"
+SITE_TITLE = "SK-L 大台中房地產" # 純粹的個人品牌名稱
 GA4_ID = "G-B7WP9BTP8X"
 MAPS_API_KEY = "AIzaSyDzgnI2Ucv622CRkWwo2GE5JRrs_Y4HQY0"
 GITHUB_IMG_BASE = "https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/"
 
-# --- 2. 品牌合規與 SEO 描述 ---
-COMPANY_INFO = """
-<div style="margin-top:40px; padding:20px; border-top:1px solid #f2f2f2; font-size:10px; color:#bbb; text-align:center; line-height:1.6; letter-spacing:0.5px;">
-    英柏國際地產有限公司 | 中市地價二字第 1070029259 號<br>
-    王一媖 經紀人 (103) 中市經紀字第 00678 號
+# --- 2. 合規資訊（置於最底，作為專業背景） ---
+LEGAL_FOOTER = """
+<div style="margin-top:80px; padding:40px 20px; border-top:1px solid #f1f1f1; background:#fafafa; color:#999; text-align:center; font-size:10px; line-height:1.8;">
+    <p style="color:#555; font-weight:700; font-size:12px; margin-bottom:10px;">英柏國際地產有限公司</p>
+    中市地價二字第 1070029259 號<br>
+    王一媖 經紀人 (103) 中市經紀字第 00678 號<br>
+    © 2026 SK-L Personal Branding.
 </div>
 """
-META_DESC = "SK林大台中房地產提供台中精選房屋物件、不動產買賣資訊。由林世塏專業團隊為您服務，精準地圖找房。"
 
 def esc(s): return html.escape(str(s or "").strip())
 
 def get_head(title, ga_id, is_home=False, map_data=None):
-    ga_code = f"""<script async src="https://www.googletagmanager.com/gtag/js?id={ga_id}"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){{dataLayer.push(arguments);}}gtag('js',new Date());gtag('config','{ga_id}');</script>""" if ga_id else ""
+    ga = f"""<script async src="https://www.googletagmanager.com/gtag/js?id={ga_id}"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){{dataLayer.push(arguments);}}gtag('js',new Date());gtag('config','{ga_id}');</script>""" if ga_id else ""
     
-    map_script = ""
-    if is_home and map_data:
-        map_script = f"""
-        <script src="https://maps.googleapis.com/maps/api/js?key={MAPS_API_KEY}&libraries=places"></script>
+    script = ""
+    if is_home:
+        script = f"""
+        <script src="https://maps.googleapis.com/maps/api/js?key={MAPS_API_KEY}"></script>
         <script>
-            function initMap() {{
-                const mapEl = document.getElementById("map");
-                const domain = window.location.hostname;
-                if (!domain.includes("shihkailin.github.io") && !domain.includes("localhost") && !domain.includes("127.0.0.1")) {{
-                    mapEl.innerHTML = "<div style='padding:50px 20px; color:#999; text-align:center;'>僅限授權網域使用</div>";
-                    return;
-                }}
-                const map = new google.maps.Map(mapEl, {{
-                    center: {{ lat: 24.162, lng: 120.647 }},
-                    zoom: 12, disableDefaultUI: true, zoomControl: true,
-                    styles: [{{ "featureType": "poi", "stylers": [{{ "visibility": "off" }}] }}]
+            function filterAndSort() {{
+                const reg = document.querySelector('.tag.f-reg.active').dataset.val;
+                const type = document.querySelector('.tag.f-type.active').dataset.val;
+                const sort = document.querySelector('.tag.f-sort.active').dataset.val;
+                
+                let cards = Array.from(document.querySelectorAll('.property-card'));
+                cards.forEach(card => {{
+                    const mReg = (reg === 'all' || card.dataset.region === reg);
+                    const mType = (type === 'all' || card.dataset.type === type);
+                    card.style.display = (mReg && mType) ? 'block' : 'none';
                 }});
-                const geocoder = new google.maps.Geocoder();
+                
+                if(sort !== 'none') {{
+                    cards.sort((a, b) => {{
+                        const pA = parseFloat(a.dataset.price) || 0;
+                        const pB = parseFloat(b.dataset.price) || 0;
+                        return sort === 'high' ? pB - pA : pA - pB;
+                    }});
+                    const list = document.getElementById('list');
+                    cards.forEach(c => list.appendChild(c));
+                }}
+            }}
+            function setTag(btn, cls) {{
+                btn.parentElement.querySelectorAll('.'+cls).forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                filterAndSort();
+            }}
+            window.onload = () => {{
+                const map = new google.maps.Map(document.getElementById("map"), {{
+                    center: {{ lat: 24.162, lng: 120.647 }}, zoom: 12, 
+                    disableDefaultUI: true, zoomControl: true,
+                    styles: [{{ "featureType": "landscape", "stylers": [{{ "color": "#f9f9f9" }}] }}, {{"featureType": "poi", "stylers": [{{"visibility": "off"}}]}}]
+                }});
                 const locations = {map_data};
                 locations.forEach(loc => {{
-                    geocoder.geocode({{ 'address': loc.address }}, (results, status) => {{
-                        if (status === 'OK') {{
-                            const marker = new google.maps.Marker({{ map: map, position: results[0].geometry.location, title: loc.name }});
-                            marker.addListener("click", () => {{ window.location.href = loc.url; }});
-                        }}
-                    }});
+                    new google.maps.Marker({{ position: loc.pos, map: map }}).addListener("click", () => window.location.href=loc.url);
                 }});
-            }}
-            window.onload = initMap;
+            }};
         </script>
         """
-
+    
     return f"""
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0">
         <title>{esc(title)}</title>
-        <meta name="description" content="{META_DESC}">
-        {ga_code}{map_script}
+        {ga}{script}
         <style>
-            :root {{ --primary: #1A365D; --accent: #E53E3E; --bg: #F7FAFC; --text: #2D3748; }}
-            body {{ font-family: 'PingFang TC', sans-serif; background: var(--bg); margin: 0; color: var(--text); -webkit-font-smoothing: antialiased; }}
-            .container {{ max-width: 500px; margin: auto; min-height: 100vh; padding-bottom: 120px; background: #fff; position: relative; box-shadow: 0 0 30px rgba(0,0,0,0.05); }}
-            .hero-banner {{ position: relative; height: 280px; background: url('{GITHUB_IMG_BASE}hero_bg.jpg') center/cover no-repeat; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; }}
-            .hero-banner::after {{ content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); }}
-            .brand-logo {{ position: relative; z-index: 2; width: 100px; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.3)); }}
-            .hero-text {{ position: relative; z-index: 2; margin-top: 10px; text-align: center; }}
-            .hero-text h2 {{ font-size: 24px; margin: 0; font-weight: 800; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }}
-            .map-wrapper {{ padding: 15px; margin-top: -30px; position: relative; z-index: 10; }}
-            #map {{ width: 100%; height: 320px; border-radius: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.15); border: 4px solid #fff; }}
-            .card {{ display: block; text-decoration: none; color: inherit; margin: 20px; background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #f0f0f0; transition: transform 0.2s; }}
-            .card:active {{ transform: scale(0.98); }}
-            .card img {{ width: 100%; height: 240px; object-fit: cover; display: block; }}
-            .card-info {{ padding: 20px; }}
-            .card-info b {{ font-size: 19px; display: block; margin-bottom: 8px; color: var(--primary); }}
-            .price-tag {{ color: var(--accent); font-size: 22px; font-weight: 900; }}
-            .btn-view {{ margin-top: 15px; display: block; text-align: center; padding: 12px; background: #EDF2F7; color: var(--primary); border-radius: 10px; font-weight: 600; font-size: 14px; text-decoration: none; }}
-            .action-bar {{ position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 500px; padding: 15px 20px 35px; display: flex; gap: 12px; background: rgba(255,255,255,0.9); backdrop-filter: blur(15px); border-top: 1px solid #f0f0f0; z-index: 999; }}
-            .btn {{ flex: 1; text-align: center; padding: 16px; border-radius: 12px; text-decoration: none; font-weight: 700; color: #fff; font-size: 15px; }}
-            .btn-call {{ background: #2D3748; }}
-            .btn-line {{ background: #00B900; }}
-            .back-btn {{ position: absolute; top: 20px; left: 20px; background: rgba(255,255,255,0.9); padding: 8px 16px; border-radius: 10px; text-decoration: none; font-size: 14px; z-index: 100; font-weight: bold; color: var(--primary); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }}
+            :root {{ --sk-navy: #1A365D; --sk-gold: #C5A059; --sk-bg: #FFFFFF; }}
+            body {{ font-family: 'PingFang TC', 'Helvetica Neue', sans-serif; background: var(--sk-bg); margin: 0; color: #333; -webkit-font-smoothing: antialiased; }}
+            .container {{ max-width: 500px; margin: auto; background: #fff; min-height: 100vh; position: relative; }}
+            
+            /* 個人品牌 Banner */
+            .hero {{ position: relative; height: 320px; background: url('{GITHUB_IMG_BASE}hero_bg.jpg') center/cover; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; }}
+            .hero::after {{ content:''; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.3); }}
+            .hero-content {{ position: relative; z-index: 2; text-align: center; }}
+            .hero-content h2 {{ font-size: 32px; margin: 0; letter-spacing: 5px; font-weight: 900; }}
+            .hero-content p {{ font-size: 11px; margin-top: 10px; letter-spacing: 4px; text-transform: uppercase; opacity: 0.9; }}
+
+            /* 地圖與過濾器 */
+            .map-box {{ margin: -40px 20px 0; position: relative; z-index: 10; }}
+            #map {{ height: 280px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.1); border: 5px solid #fff; }}
+            
+            .filter-section {{ padding: 35px 20px 10px; }}
+            .filter-group {{ display: flex; gap: 10px; overflow-x: auto; padding-bottom: 15px; scrollbar-width: none; }}
+            .filter-group::-webkit-scrollbar {{ display: none; }}
+            .tag {{ padding: 8px 18px; border-radius: 50px; background: #f0f2f5; font-size: 13px; color: #666; cursor: pointer; white-space: nowrap; border:none; font-weight: 600; }}
+            .tag.active {{ background: var(--sk-navy); color: #fff; }}
+
+            /* 物件卡片：品牌質感 */
+            .property-card {{ margin: 30px 20px; border-radius: 24px; overflow: hidden; background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.05); transition: 0.3s; }}
+            .property-card img {{ width: 100%; height: 280px; object-fit: cover; display: block; }}
+            .card-info {{ padding: 25px; }}
+            .card-info h4 {{ font-size: 20px; margin: 0; color: var(--sk-navy); font-weight: 800; }}
+            .price {{ font-size: 22px; color: var(--sk-gold); font-weight: 900; margin: 10px 0; }}
+            .btn-link {{ display: block; text-align: center; margin-top: 15px; padding: 14px; background: #f8fafc; color: var(--sk-navy); text-decoration: none; font-size: 13px; font-weight: 700; border-radius: 12px; }}
+
+            /* 聯絡按鈕 */
+            .action-bar {{ position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 500px; padding: 15px 20px 35px; display: flex; gap: 12px; background: rgba(255,255,255,0.85); backdrop-filter: blur(15px); border-top: 1px solid #f1f1f1; z-index: 999; }}
+            .btn {{ flex: 1; text-align: center; padding: 18px; border-radius: 18px; text-decoration: none; font-weight: 800; color: #fff; font-size: 15px; }}
+            .btn-call {{ background: #1A202C; }} .btn-line {{ background: #00B900; }}
+            .back-btn {{ position: absolute; top: 25px; left: 25px; background: #fff; padding: 10px 20px; border-radius: 14px; text-decoration: none; font-weight: 800; color: var(--sk-navy); z-index: 100; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }}
         </style>
     </head>
     """
@@ -95,36 +121,38 @@ def build():
     for p in out.glob("p*"):
         if p.is_dir() and re.match(r'^p\d+$', p.name): shutil.rmtree(p)
 
-    print(f"📡 正在同步 Google 試算表物件至 {SITE_TITLE}...")
     res = requests.get(SHEET_CSV_URL); res.encoding = 'utf-8-sig'
     reader = csv.DictReader(res.text.splitlines())
-    items, map_data = [], []
+    items, map_data, regions, types = [], [], set(), set()
 
     for i, row in enumerate(reader):
         row = {str(k).strip().replace('\ufeff', ''): str(v).strip() for k, v in row.items() if k}
         if str(row.get("狀態", "")).upper() not in ["ON", "TRUE"] or not row.get("案名"): continue
 
-        name, price, addr, desc_text = row.get("案名",""), row.get("價格",""), row.get("地址",""), row.get("描述","")
+        name, price_str, ext_url = row.get("案名",""), row.get("價格",""), row.get("外部連結網址", "")
+        price_val = re.sub(r'[^\d.]', '', price_str)
+        reg, type_val = row.get("區域", "台中市"), row.get("用途", "住宅")
+        regions.add(reg); types.add(type_val)
+        
         img = str(row.get("圖片網址",""))
         if not img.startswith("http"): img = f"{GITHUB_IMG_BASE}{img.lstrip('/')}"
         
         slug = f"p{i}"
         (out/slug).mkdir(exist_ok=True)
-        loc_text = addr if addr else f"台中市{name}"
-        map_data.append({"name": name, "address": loc_text, "url": f"./{slug}/"})
+        final_url = ext_url if ext_url.startswith("http") else f"./{slug}/"
+        map_data.append({"name": name, "pos": {"lat": 24.162, "lng": 120.647}, "url": final_url})
 
+        # 子網頁：個人品牌氛圍
         detail_html = f"""
         <div class="container">
-            <a href="../" class="back-btn">✕ 關閉詳情</a>
-            <img src="{img}" style="width:100%; height:380px; object-fit:cover; display:block;">
-            <div style="padding:30px; margin-top:-30px; background:#fff; border-radius:30px 30px 0 0; position:relative;">
-                <h1 style="font-size:26px; font-weight:800; color:var(--primary); margin:0;">{esc(name)}</h1>
-                <div class="price-tag" style="margin:10px 0 25px;">{esc(price)}</div>
-                <div style="line-height:1.8; color:#4A5568; font-size:16px; background:#F7FAFC; padding:20px; border-radius:15px;">
-                    {esc(desc_text).replace('、', '<br>• ')}
-                </div>
-                <a href="https://www.google.com/maps/search/?api=1&query={urllib.parse.quote(loc_text)}" target="_blank" style="display:flex; align-items:center; justify-content:center; gap:8px; padding:16px; background:var(--primary); border-radius:12px; color:#fff; text-decoration:none; margin-top:25px; font-weight:700;">📍 前往 Google 地圖導航</a>
-                {COMPANY_INFO}
+            <a href="../" class="back-btn">← 返回</a>
+            <img src="{img}" style="width:100%; height:450px; object-fit:cover; display:block;">
+            <div style="padding:40px 25px; margin-top:-50px; background:#fff; border-radius:40px 40px 0 0; position:relative;">
+                <h1 style="font-size:28px; font-weight:800; color:var(--sk-navy); margin:0;">{esc(name)}</h1>
+                <div class="price">{esc(price_str)}</div>
+                <div style="line-height:2; color:#4a5568; margin-top:25px; font-size:16px;">{esc(row.get("描述","")).replace('、','<br>• ')}</div>
+                <a href="https://www.google.com/maps/search/?api=1&query={urllib.parse.quote(row.get('地址', name))}" target="_blank" style="display:block; text-align:center; padding:18px; background:var(--sk-navy); color:#fff; text-decoration:none; border-radius:15px; margin-top:30px; font-weight:700;">📍 前往地圖導航</a>
+                {LEGAL_FOOTER}
             </div>
             <div class="action-bar"><a href="tel:{MY_PHONE}" class="btn btn-call">致電聯繫</a><a href="{MY_LINE_URL}" class="btn btn-line">LINE 諮詢</a></div>
         </div>
@@ -132,32 +160,36 @@ def build():
         (out/slug/"index.html").write_text(f"<!doctype html><html lang='zh-TW'>{get_head(name, GA4_ID)}<body>{detail_html}</body></html>", encoding="utf-8")
         
         items.append(f'''
-            <div class="card">
-                <a href="./{slug}/"><img src="{img}"></a>
+            <div class="property-card" data-region="{esc(reg)}" data-type="{esc(type_val)}" data-price="{price_val}">
+                <a href="{final_url}"><img src="{img}"></a>
                 <div class="card-info">
-                    <b>{esc(name)}</b>
-                    <div class="price-tag">{esc(price)}</div>
-                    <a href="./{slug}/" class="btn-view">查看詳情空間</a>
+                    <h4>{esc(name)}</h4>
+                    <div class="price">{esc(price_str)}</div>
+                    <div style="font-size:12px; color:#999;">{esc(reg)} • {esc(type_val)}</div>
+                    <a href="{final_url}" class="btn-link">查看完整資訊</a>
                 </div>
             </div>
         ''')
 
+    reg_btns = ''.join([f'<button class="tag f-reg" data-val="{esc(r)}" onclick="setTag(this, \'f-reg\')">{esc(r)}</button>' for r in sorted(regions)])
+    type_btns = ''.join([f'<button class="tag f-type" data-val="{esc(t)}" onclick="setTag(this, \'f-type\')">{esc(t)}</button>' for t in sorted(types)])
+
     home_html = f"""
     <div class="container">
-        <div class="hero-banner">
-            <img src="{GITHUB_IMG_BASE}logo.jpg" class="brand-logo">
-            <div class="hero-text">
-                <h2>{SITE_TITLE}</h2>
-                <p style="margin:0; font-size:12px; opacity:0.8; letter-spacing:1px;">EVERCEDAR INTERNATIONAL REALTY</p>
-            </div>
+        <div class="hero"><div class="hero-content"><h2>{SITE_TITLE}</h2><p>Curated Real Estate • Taichung</p></div></div>
+        <div class="map-box"><div id="map"></div></div>
+        
+        <div class="filter-section">
+            <div class="filter-group"><button class="tag f-reg active" data-val="all" onclick="setTag(this, 'f-reg')">全部地區</button>{reg_btns}</div>
+            <div class="filter-group" style="margin-top:10px;"><button class="tag f-type active" data-val="all" onclick="setTag(this, 'f-type')">所有用途</button>{type_btns}</div>
+            <div class="filter-group" style="margin-top:10px; border-top:1px solid #f0f0f0; padding-top:15px;"><button class="tag f-sort active" data-val="none" onclick="setTag(this, 'f-sort')">預設排序</button><button class="tag f-sort" data-val="high" onclick="setTag(this, 'f-sort')">價格：高至低</button><button class="tag f-sort" data-val="low" onclick="setTag(this, 'f-sort')">價格：低至高</button></div>
         </div>
-        <div class="map-wrapper"><div id="map"></div></div>
-        <div class="header" style="padding: 10px 20px;"><p style="font-size:14px; color:#718096; margin:0;">林世塏為您精選大台中房產物件</p></div>
-        {''.join(items)}
-        {COMPANY_INFO}
+
+        <div id="list">{''.join(items)}</div>
+        {LEGAL_FOOTER}
+        <div class="action-bar"><a href="tel:{MY_PHONE}" class="btn btn-call">致電 SK-L</a><a href="{MY_LINE_URL}" class="btn btn-line">LINE 諮詢</a></div>
     </div>
     """
     (out/"index.html").write_text(f"<!doctype html><html lang='zh-TW'>{get_head(SITE_TITLE, GA4_ID, True, map_data)}<body>{home_html}</body></html>", encoding="utf-8")
-    print(f"✅ 成功同步 {len(items)} 個物件至 {SITE_TITLE}！")
 
 if __name__ == "__main__": build()

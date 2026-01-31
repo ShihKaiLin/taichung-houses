@@ -22,8 +22,10 @@ def esc(s): return html.escape(str(s or "").strip())
 
 def get_head(title, ga_id, is_home=False, map_data=None):
     ga = f"""<script async src="https://www.googletagmanager.com/gtag/js?id={ga_id}"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){{dataLayer.push(arguments);}}gtag('js',new Date());gtag('config','{ga_id}');</script>""" if ga_id else ""
+    
     map_script = ""
     if is_home and map_data:
+        # 修復大括號解析問題
         map_script = f"""
         <script src="https://maps.googleapis.com/maps/api/js?key={MAPS_API_KEY}&libraries=places"></script>
         <script>
@@ -54,6 +56,7 @@ def get_head(title, ga_id, is_home=False, map_data=None):
             window.onload = initMap;
         </script>
         """
+    
     return f"""
     <head>
         <meta charset="utf-8">
@@ -64,13 +67,11 @@ def get_head(title, ga_id, is_home=False, map_data=None):
             :root {{ --primary: #1A365D; --accent: #E53E3E; --bg: #F7FAFC; }}
             body {{ font-family: 'PingFang TC', sans-serif; background: var(--bg); margin: 0; color: #2D3748; }}
             .container {{ max-width: 500px; margin: auto; min-height: 100vh; padding-bottom: 120px; background: #fff; position: relative; }}
-            
-            /* 英雄看板美化 */
             .hero-banner {{
                 position: relative; height: 280px; 
                 background: url('{GITHUB_IMG_BASE}hero_bg.jpg') center/cover no-repeat;
                 display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff;
-            }
+            }}
             .hero-banner::after {{
                 content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
                 background: rgba(0,0,0,0.3);
@@ -78,19 +79,13 @@ def get_head(title, ga_id, is_home=False, map_data=None):
             .brand-logo {{ position: relative; z-index: 2; width: 100px; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.3)); }}
             .hero-text {{ position: relative; z-index: 2; margin-top: 10px; text-align: center; }}
             .hero-text h2 {{ font-size: 22px; margin: 0; font-weight: 800; letter-spacing: 2px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }}
-            
             .map-wrapper {{ padding: 15px; margin-top: -30px; position: relative; z-index: 10; }}
             #map {{ width: 100%; height: 300px; border-radius: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); border: 4px solid #fff; }}
-            
-            .header {{ padding: 10px 20px 10px; }}
-            .header h1 {{ font-size: 20px; color: var(--primary); font-weight: 900; margin: 0; }}
-
             .card {{ display: block; text-decoration: none; color: inherit; margin: 20px; background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #f0f0f0; }}
             .card img {{ width: 100%; height: 240px; object-fit: cover; }}
             .card-info {{ padding: 20px; }}
             .price-tag {{ color: var(--accent); font-size: 22px; font-weight: 900; }}
             .btn-view {{ margin-top: 15px; display: block; text-align: center; padding: 12px; background: #EDF2F7; color: var(--primary); border-radius: 10px; font-weight: 600; font-size: 14px; text-decoration: none; }}
-            
             .action-bar {{ position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 500px; padding: 15px 20px 35px; display: flex; gap: 12px; background: rgba(255,255,255,0.9); backdrop-filter: blur(15px); border-top: 1px solid #f0f0f0; z-index: 999; }}
             .btn {{ flex: 1; text-align: center; padding: 16px; border-radius: 12px; text-decoration: none; font-weight: 700; color: #fff; font-size: 15px; }}
             .btn-call {{ background: #2D3748; }}
@@ -102,10 +97,12 @@ def get_head(title, ga_id, is_home=False, map_data=None):
 
 def build():
     out = Path(".")
+    # 清理舊物件
     for p in out.glob("p*"):
         if p.is_dir() and re.match(r'^p\d+$', p.name): shutil.rmtree(p)
 
-    res = requests.get(SHEET_CSV_URL); res.encoding = 'utf-8-sig'
+    res = requests.get(SHEET_CSV_URL)
+    res.encoding = 'utf-8-sig'
     reader = csv.DictReader(res.text.splitlines())
     items, map_data = [], []
 

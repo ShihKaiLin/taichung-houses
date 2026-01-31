@@ -2,19 +2,19 @@ import os, csv, requests, html, shutil, re, urllib.parse
 from pathlib import Path
 from datetime import datetime
 
-# --- 1. 核心配置 ---
-# 這些資訊確保您的 GA4 與聯絡管道運作正常
+# --- 1. 核心配置 (已整合您的試算表金鑰網址) ---
+# 這裡已填入您發布的 CSV 網址，確保程式能直接讀取 131 個物件
 SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQShAl0-TbUU0MQdYVe53im2T6lXQgh_7g-bdL6HHpIBFtA2yfIAMbPw4J9RgZUkROb9AAiMhnRC0kH/pub?output=csv"
 MY_PHONE = "0938-615-351"
 MY_LINE_URL = "https://line.me/ti/p/FDsMyAYDv"
 SITE_TITLE = "林世塏｜台中地圖找房"
 BASE_URL = "https://shihkailin.github.io/taichung-houses"
-GA4_ID = "G-B7WP9BTP8X"
+GA4_ID = "G-B7WP9BTP8X" #
 
 def esc(s): return html.escape(str(s or "").strip())
 
 def get_final_img_url(url):
-    """【自動圖床】支援 GitHub images/ 資料夾，讓您填試算表更輕鬆"""
+    """【自動化圖床】優先讀取 GitHub 內 images/ 資料夾的照片"""
     url = str(url).strip()
     if not url: return "https://placehold.co/600x400?text=照片整理中"
     if not url.startswith("http"):
@@ -22,7 +22,7 @@ def get_final_img_url(url):
     return url
 
 def get_head(title, ga_id, img_url, page_url):
-    """【巷導風 CSS】模擬地圖 App 質感，提升客戶留存率"""
+    """【巷導風視覺】導入 GA4 追蹤 131 個物件的點擊熱度"""
     ga = f"""<script async src="https://www.googletagmanager.com/gtag/js?id={ga_id}"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){{dataLayer.push(arguments);}}gtag('js',new Date());gtag('config','{ga_id}');</script>""" if ga_id else ""
     return f"""
     <head>
@@ -31,7 +31,6 @@ def get_head(title, ga_id, img_url, page_url):
         <title>{esc(title)}</title>
         <meta property="og:title" content="{esc(title)}">
         <meta property="og:image" content="{img_url}">
-        <meta property="og:url" content="{page_url}">
         {ga}
         <style>
             :root {{ --alley-blue: #2A58AD; --alley-gray: #f2f4f7; --alley-dark: #333; }}
@@ -42,12 +41,11 @@ def get_head(title, ga_id, img_url, page_url):
             .filter-bar {{ display: flex; gap: 8px; padding: 12px 20px; overflow-x: auto; background: #fff; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }}
             .filter-btn {{ padding: 6px 16px; background: var(--alley-gray); border-radius: 6px; text-decoration: none; color: #666; font-size: 13px; font-weight: 500; white-space: nowrap; border: 1px solid transparent; }}
             .filter-btn.active {{ background: #fff; color: var(--alley-blue); border-color: var(--alley-blue); }}
-            .card {{ display: block; text-decoration: none; color: inherit; margin: 15px 20px; background: #fff; border-radius: 12px; overflow: hidden; border: 1px solid #eee; box-shadow: 0 2px 8px rgba(0,0,0,0.03); transition: transform 0.2s; }}
+            .card {{ display: block; text-decoration: none; color: inherit; margin: 15px 20px; background: #fff; border-radius: 12px; overflow: hidden; border: 1px solid #eee; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }}
             .card-img-box {{ position: relative; width: 100%; height: 220px; }}
             .card img {{ width: 100%; height: 100%; object-fit: cover; }}
             .area-tag {{ position: absolute; top: 12px; left: 12px; background: rgba(255,255,255,0.9); padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: bold; color: var(--alley-blue); }}
             .card-info {{ padding: 16px; }}
-            .card-info b {{ font-size: 17px; display: block; margin-bottom: 5px; }}
             .price {{ color: #e53e3e; font-size: 22px; font-weight: 800; }}
             .action-bar {{ position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; padding: 12px 15px 30px; display: flex; gap: 8px; background: #fff; border-top: 1px solid #eee; z-index: 200; }}
             .btn {{ flex: 1; text-align: center; padding: 14px; border-radius: 8px; text-decoration: none; font-weight: bold; color: #fff; font-size: 14px; }}
@@ -60,13 +58,13 @@ def get_head(title, ga_id, img_url, page_url):
 
 def build():
     out = Path(".") 
-    # 自動清理舊物件，維持系統整潔
+    # 自動清除舊物件分頁，確保網站更新乾淨
     for p in out.glob("p*"):
         if p.is_dir() and re.match(r'^p\d+$', p.name): shutil.rmtree(p)
     if (out/"area").exists(): shutil.rmtree(out/"area")
     (out/"area").mkdir(exist_ok=True)
 
-    print("🚀 啟動『林世塏』純淨導流版更新...")
+    print("🚀 啟動『林世塏』131 物件勾選自動化更新...")
     res = requests.get(SHEET_CSV_URL); res.encoding = 'utf-8-sig'
     reader = csv.DictReader(res.text.splitlines())
 
@@ -74,7 +72,11 @@ def build():
 
     for i, row in enumerate(reader):
         row = {str(k).strip().replace('\ufeff', ''): str(v).strip() for k, v in row.items() if k}
-        if row.get("狀態") != "ON" or not row.get("案名"): continue
+        
+        # 【勾選框辨識】支援 TRUE (勾選) 或 ON (手填)
+        status = str(row.get("狀態", "")).upper()
+        if status not in ["ON", "TRUE"] or not row.get("案名"): 
+            continue
 
         img = get_final_img_url(row.get("圖片網址", ""))
         name, area, price, addr = row.get("案名", ""), row.get("區域", ""), row.get("價格", ""), row.get("地址", "")
@@ -86,7 +88,7 @@ def build():
         
         map_link = f"https://www.google.com/maps/search/?api=1&query={urllib.parse.quote(addr if addr else name)}"
         
-        # 外部導流按鈕：解決繁瑣坪數資料，一鍵導向官網
+        # 外部連結按鈕：引導至詳細建坪數據
         ext_btn_html = ""
         if ext_url:
             btn_txt = "查看完整建坪與格局圖" if "ychouse" in ext_url else "前往 591 查看詳細數據"
@@ -98,7 +100,7 @@ def build():
             <img src="{img}" style="width:100%; height:320px; object-fit:cover;">
             <div style="padding:25px; background:#fff; margin-top:-15px; border-radius:15px 15px 0 0; position:relative;">
                 <span style="color:var(--alley-blue); font-size:12px; font-weight:bold;">📍 {esc(area)}</span>
-                <h1 style="font-size:22px; margin:8px 0; letter-spacing:-0.5px;">{esc(name)}</h1>
+                <h1 style="font-size:22px; margin:8px 0;">{esc(name)}</h1>
                 <div class="price" style="margin-bottom:15px;">{esc(price)}</div>
                 <div style="background:var(--alley-gray); padding:15px; border-radius:8px; font-size:14px; color:#555;">
                     {esc(row.get("描述","")).replace('、', '<br>• ')}
@@ -115,15 +117,16 @@ def build():
         items.append(card_html)
         area_map.setdefault(area, []).append(card_html.replace('./', '../../'))
 
-    # 生成分類導航與首頁
+    # 生成分類按鈕
     sorted_areas = sorted(area_map.keys())
-    filter_html = f'<div class="filter-bar"><a href="{BASE_URL}/" class="filter-btn active">全部</a>'
+    filter_html = f'<div class="filter-bar"><a href="{BASE_URL}/" class="filter-btn active">全部區域</a>'
     for area in sorted_areas: filter_html += f'<a href="{BASE_URL}/area/{urllib.parse.quote(area)}/" class="filter-btn">{area}</a>'
     filter_html += '</div>'
 
+    # 生成首頁
     (out/"index.html").write_text(f"<!doctype html><html>{get_head(SITE_TITLE, GA4_ID, '', f'{BASE_URL}/')}<body><div class='container'><div class='header'><h1>{SITE_TITLE}</h1></div>{filter_html}{''.join(items)}</div></body></html>", encoding="utf-8")
     
-    # Sitemap 提升搜尋引擎收錄率
+    # 自動產出 Sitemap 提升收錄權重
     sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
     for url in sitemap_urls: sitemap += f'  <url><loc>{url}</loc><lastmod>{datetime.now().strftime("%Y-%m-%d")}</lastmod></url>\n'
     sitemap += '</urlset>'

@@ -1,14 +1,12 @@
 import os, csv, requests, html, shutil, re, urllib.parse
 from pathlib import Path
 
-# --- 1. 個人品牌配置 ---
+# --- 1. 個人品牌核心配置 ---
 SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQShAl0-TbUU0MQdYVe53im2T6lXQgh_7g-bdL6HHpIBFtA2yfIAMbPw4J9RgZUkROb9AAiMhnRC0kH/pub?output=csv"
-MY_PHONE = "0938-615-351"
-MY_LINE_URL = "https://line.me/ti/p/FDsMyAYDv"
-SITE_TITLE = "SK-L 大台中房地產"
-GA4_ID = "G-B7WP9BTP8X"
+MY_PHONE, MY_LINE_URL = "0938-615-351", "https://line.me/ti/p/FDsMyAYDv"
+SITE_TITLE, GA4_ID = "SK-L 大台中房地產", "G-B7WP9BTP8X"
 MAPS_API_KEY = "AIzaSyDzgnI2Ucv622CRkWwo2GE5JRrs_Y4HQY0"
-GITHUB_IMG_BASE = "https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/"
+IMG_BASE = "https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/"
 
 # --- 2. 質感合規資訊 ---
 LEGAL_FOOTER = """
@@ -23,11 +21,14 @@ LEGAL_FOOTER = """
 
 def esc(s): return html.escape(str(s or "").strip())
 
-def get_head(title, ga_id, is_home=False, map_data=None):
-    ga = f"""<script async src="https://www.googletagmanager.com/gtag/js?id={ga_id}"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){{dataLayer.push(arguments);}}gtag('js',new Date());gtag('config','{ga_id}');</script>""" if ga_id else ""
-    script = ""
+def get_head(title, desc="", is_home=False, map_data=None):
+    # 強大 SEO：自動生成描述與關鍵字
+    seo_desc = esc(desc)[:80] if desc else f"{SITE_TITLE} - 精選台中優質房產物件，林世塏為您專業服務。"
+    ga = f"""<script async src="https://www.googletagmanager.com/gtag/js?id={GA4_ID}"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){{dataLayer.push(arguments);}}gtag('js',new Date());gtag('config','{GA4_ID}');</script>"""
+    
+    map_script = ""
     if is_home:
-        script = f"""
+        map_script = f"""
         <script src="https://maps.googleapis.com/maps/api/js?key={MAPS_API_KEY}"></script>
         <script>
             function filterAndSort() {{
@@ -35,10 +36,10 @@ def get_head(title, ga_id, is_home=False, map_data=None):
                 const type = document.querySelector('.tag.f-type.active').dataset.val;
                 const sort = document.querySelector('.tag.f-sort.active').dataset.val;
                 let cards = Array.from(document.querySelectorAll('.property-card'));
-                cards.forEach(card => {{
-                    const mReg = (reg === 'all' || card.dataset.region === reg);
-                    const mType = (type === 'all' || card.dataset.type === type);
-                    card.style.display = (mReg && mType) ? 'block' : 'none';
+                cards.forEach(c => {{
+                    const mReg = (reg === 'all' || c.dataset.region === reg);
+                    const mType = (type === 'all' || c.dataset.type === type);
+                    c.style.display = (mReg && mType) ? 'block' : 'none';
                 }});
                 if(sort !== 'none') {{
                     cards.sort((a, b) => {{
@@ -57,9 +58,7 @@ def get_head(title, ga_id, is_home=False, map_data=None):
             }}
             function initMap() {{
                 const map = new google.maps.Map(document.getElementById("map"), {{
-                    center: {{ lat: 24.162, lng: 120.647 }}, zoom: 12, 
-                    disableDefaultUI: true, zoomControl: true,
-                    styles: [{{ "featureType": "poi", "stylers": [{{ "visibility": "off" }}] }}]
+                    center: {{ lat: 24.162, lng: 120.647 }}, zoom: 12, disableDefaultUI: true, zoomControl: true
                 }});
                 const geocoder = new google.maps.Geocoder();
                 const locations = {map_data};
@@ -67,7 +66,7 @@ def get_head(title, ga_id, is_home=False, map_data=None):
                     geocoder.geocode({{ 'address': loc.address }}, (results, status) => {{
                         if (status === 'OK') {{
                             const marker = new google.maps.Marker({{ position: results[0].geometry.location, map: map, title: loc.name }});
-                            marker.addListener("click", () => {{ 
+                            marker.addListener("click", () => {{
                                 if(loc.url.startsWith('http')) window.open(loc.url, '_blank');
                                 else window.location.href = loc.url;
                             }});
@@ -78,83 +77,78 @@ def get_head(title, ga_id, is_home=False, map_data=None):
             window.onload = initMap;
         </script>
         """
-    return f"""<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0"><title>{esc(title)}</title>{ga}{script}<style>:root {{ --sk-navy: #1A365D; --sk-gold: #C5A059; --sk-bg: #FFFFFF; }}body {{ font-family: 'PingFang TC', sans-serif; background: #fff; margin: 0; -webkit-font-smoothing: antialiased; }}.container {{ max-width: 500px; margin: auto; background: #fff; min-height: 100vh; position: relative; box-shadow: 0 0 40px rgba(0,0,0,0.05); }}.hero {{ position: relative; height: 320px; background: url('{GITHUB_IMG_BASE}hero_bg.jpg') center/cover; display: flex; align-items: center; justify-content: center; color: #fff; }}.hero::after {{ content:''; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.3); }}.hero-content {{ position: relative; z-index: 2; text-align: center; }}.hero-content h2 {{ font-size: 32px; margin: 0; letter-spacing: 5px; font-weight: 900; }}.map-box {{ margin: -40px 20px 0; position: relative; z-index: 10; }}#map {{ height: 280px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.1); border: 5px solid #fff; }}.filter-section {{ padding: 35px 20px 10px; }}.filter-group {{ display: flex; gap: 10px; overflow-x: auto; padding-bottom: 15px; scrollbar-width: none; }}.filter-group::-webkit-scrollbar {{ display: none; }}.tag {{ padding: 8px 18px; border-radius: 50px; background: #f0f2f5; font-size: 13px; color: #666; cursor: pointer; white-space: nowrap; border:none; font-weight: 600; }}.tag.active {{ background: var(--sk-navy); color: #fff; }}.property-card {{ margin: 30px 20px; border-radius: 24px; overflow: hidden; background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }}.property-card img {{ width: 100%; height: 280px; object-fit: cover; display: block; }}.card-info {{ padding: 25px; }}.price {{ font-size: 22px; color: var(--sk-gold); font-weight: 900; }}.action-bar {{ position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 500px; padding: 15px 25px 40px; display: flex; gap: 12px; background: rgba(255,255,255,0.85); backdrop-filter: blur(15px); border-top: 1px solid #f1f1f1; z-index: 999; }}.btn {{ flex: 1; text-align: center; padding: 18px; border-radius: 18px; text-decoration: none; font-weight: 800; color: #fff; font-size: 15px; }}.btn-call {{ background: #1A202C; }} .btn-line {{ background: #00B900; }}.back-btn {{ position: absolute; top: 25px; left: 25px; background: #fff; padding: 10px 20px; border-radius: 14px; text-decoration: none; font-weight: 800; color: var(--sk-navy); z-index: 100; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }}.btn-ext-link {{ display: block; text-align: center; padding: 16px; background: var(--sk-navy); color: #fff; text-decoration: none; border-radius: 14px; margin: 15px 0; font-weight: 700; font-size: 15px; }}</style></head>"""
+    
+    return f"""
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0">
+        <title>{esc(title)}</title>
+        <meta name="description" content="{seo_desc}">
+        {ga}{map_script}
+        <style>
+            :root {{ --sk-navy: #1A365D; --sk-gold: #C5A059; --sk-bg: #FFFFFF; }}
+            body {{ font-family: 'PingFang TC', sans-serif; background: #fff; margin: 0; -webkit-font-smoothing: antialiased; }}
+            .container {{ max-width: 500px; margin: auto; background: #fff; min-height: 100vh; position: relative; box-shadow: 0 0 40px rgba(0,0,0,0.05); }}
+            .hero {{ position: relative; height: 320px; background: url('{IMG_BASE}hero_bg.jpg') center/cover; display: flex; align-items: center; justify-content: center; color: #fff; }}
+            .hero::after {{ content:''; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.3); }}
+            .hero-content {{ position: relative; z-index: 2; text-align: center; }}
+            .hero-content h2 {{ font-size: 32px; margin: 0; letter-spacing: 5px; font-weight: 900; }}
+            .map-box {{ margin: -40px 20px 0; position: relative; z-index: 10; }}
+            #map {{ height: 280px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.1); border: 5px solid #fff; }}
+            .filter-section {{ padding: 35px 20px 10px; }}
+            .filter-group {{ display: flex; gap: 10px; overflow-x: auto; padding-bottom: 15px; scrollbar-width: none; }}
+            .tag {{ padding: 8px 18px; border-radius: 50px; background: #f0f2f5; font-size: 13px; color: #666; cursor: pointer; white-space: nowrap; border:none; font-weight: 600; }}
+            .tag.active {{ background: var(--sk-navy); color: #fff; }}
+            .property-card {{ margin: 30px 20px; border-radius: 24px; overflow: hidden; background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }}
+            .property-card img {{ width: 100%; height: 280px; object-fit: cover; display: block; }}
+            .card-info {{ padding: 25px; }}
+            .price {{ font-size: 22px; color: var(--sk-gold); font-weight: 900; }}
+            .action-bar {{ position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 500px; padding: 15px 25px 40px; display: flex; gap: 12px; background: rgba(255,255,255,0.85); backdrop-filter: blur(15px); border-top: 1px solid #f1f1f1; z-index: 999; }}
+            .btn {{ flex: 1; text-align: center; padding: 18px; border-radius: 18px; text-decoration: none; font-weight: 800; color: #fff; font-size: 15px; }}
+            .btn-call {{ background: #1A202C; }} .btn-line {{ background: #00B900; }}
+            .back-btn {{ position: absolute; top: 25px; left: 25px; background: #fff; padding: 10px 20px; border-radius: 14px; text-decoration: none; font-weight: 800; color: var(--sk-navy); z-index: 100; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }}
+            .btn-ext-main {{ display: block; text-align: center; padding: 16px; background: var(--sk-navy); color: #fff; text-decoration: none; border-radius: 14px; margin-top: 15px; font-weight: 700; font-size: 15px; }}
+        </style>
+    </head>
+    """
 
 def build():
     out = Path(".")
     for p in out.glob("p*"):
         if p.is_dir() and re.match(r'^p\d+$', p.name): shutil.rmtree(p)
-
+    
     res = requests.get(SHEET_CSV_URL); res.encoding = 'utf-8-sig'
     reader = csv.DictReader(res.text.splitlines())
     items, map_data, regions, types = [], [], set(), set()
-
+    
     for i, row in enumerate(reader):
-        # 關鍵修正：將所有 Key 轉小寫並去除空白，防止欄位名稱對不上的問題
-        clean_row = {str(k).strip().lower(): str(v).strip() for k, v in row.items() if k}
+        d = {str(k).strip(): str(v).strip() for k, v in row.items() if k}
+        ext_url = next((v for v in d.values() if v.startswith("http") and not any(x in v.lower() for x in ['.jpg','.png','.jpeg','.webp'])), "")
+        name = d.get("案名") or next((v for k,v in d.items() if "案名" in k), "")
+        if not name or d.get("狀態") in ["OFF", "FALSE"]: continue
         
-        # 模糊搜尋欄位
-        name = clean_row.get("案名") or clean_row.get("物件名稱") or ""
-        if not name or clean_row.get("狀態", "").upper() in ["OFF", "FALSE"]: continue
+        reg, p_str, slug = d.get("區域","台中"), d.get("價格","面議"), f"p{i}"
+        regions.add(reg); types.add(d.get("用途","住宅"))
+        img = d.get("圖片網址") or next((v for k,v in d.items() if "圖片" in k), "")
+        if not img.startswith("http"): img = f"{IMG_BASE}{img.lstrip('/')}"
         
-        price_str = clean_row.get("價格") or clean_row.get("售價") or "面議"
-        ext_url = clean_row.get("外部連結網址") or clean_row.get("外部連結") or clean_row.get("網址") or ""
-        reg = clean_row.get("區域") or clean_row.get("地段") or "台中市"
-        type_val = clean_row.get("用途") or clean_row.get("類型") or "住宅"
-        addr = clean_row.get("地址") or clean_row.get("位置") or ""
-        desc = clean_row.get("描述") or clean_row.get("物件描述") or ""
-        
-        price_val = re.sub(r'[^\d.]', '', price_str)
-        regions.add(reg); types.add(type_val)
-        
-        img = clean_row.get("圖片網址") or clean_row.get("圖片") or ""
-        if not img.startswith("http"): img = f"{GITHUB_IMG_BASE}{img.lstrip('/')}"
-        
-        slug = f"p{i}"
         (out/slug).mkdir(exist_ok=True)
-        loc_text = addr if addr else f"台中市{name}"
+        f_url = ext_url if ext_url.startswith("http") else f"./{slug}/"
+        map_data.append({"name":name, "address":d.get("地址",name), "url":f_url})
         
-        # 連結判斷
-        is_external = ext_url.startswith("http")
-        final_url = ext_url if is_external else f"./{slug}/"
-        map_data.append({"name": name, "address": loc_text, "url": final_url})
-
-        # 生成詳情頁
-        ext_btn = f'<a href="{ext_url}" target="_blank" class="btn-ext-link">🌐 前往 591 / 樂屋網 查看詳細資訊</a>' if is_external else ""
-        detail_html = f"""
-        <div class="container">
-            <a href="../" class="back-btn">← 返回</a>
-            <img src="{img}" style="width:100%; height:450px; object-fit:cover; display:block;">
-            <div style="padding:40px 25px; margin-top:-50px; background:#fff; border-radius:40px 40px 0 0; position:relative;">
-                <h1 style="font-size:28px; font-weight:800; color:var(--sk-navy); margin:0;">{esc(name)}</h1>
-                <div class="price">{esc(price_str)}</div>
-                <div style="line-height:2.1; color:#4a5568; margin:25px 0; font-size:16px;">{esc(desc).replace('、', '<br>• ')}</div>
-                {ext_btn}
-                <a href="https://www.google.com/maps/search/?api=1&query={urllib.parse.quote(loc_text)}" target="_blank" style="display:block; text-align:center; padding:18px; border:1.5px solid var(--sk-navy); color:var(--sk-navy); text-decoration:none; border-radius:15px; font-weight:700;">📍 前往地圖導航</a>
-                {LEGAL_FOOTER}
-            </div>
-            <div class="action-bar"><a href="tel:{MY_PHONE}" class="btn btn-call">致電 SK-L</a><a href="{MY_LINE_URL}" class="btn btn-line">LINE 諮詢</a></div>
-        </div>
-        """
-        (out/slug/"index.html").write_text(f"<!doctype html><html lang='zh-TW'>{get_head(name, GA4_ID)}<body>{detail_html}</body></html>", encoding="utf-8")
+        # 子網頁 SEO：針對案名優化 Meta
+        ext_btn = f'<a href="{ext_url}" target="_blank" class="btn-ext-main">🌐 查看原始物件連結 (591/樂屋)</a>' if ext_url else ""
+        detail = f"""<div class="container"><a href="../" class="back-btn">← 返回</a><img src="{img}" style="width:100%;height:450px;object-fit:cover;display:block;"><div style="padding:40px 25px;background:#fff;border-radius:40px 40px 0 0;margin-top:-50px;position:relative;"><h1 style="font-size:28px;font-weight:800;color:var(--sk-navy);margin:0;">{esc(name)}</h1><div class="price">{esc(p_str)}</div><div style="line-height:2.1;color:#4a5568;margin:25px 0;font-size:16px;">{esc(d.get("描述","")).replace('、','<br>• ')}</div>{ext_btn}<a href="https://www.google.com/maps/search/?api=1&query={urllib.parse.quote(d.get("地址",name))}" target="_blank" style="display:block;text-align:center;padding:18px;background:var(--sk-navy);color:#fff;text-decoration:none;border-radius:15px;margin-top:15px;font-weight:700;">📍 前往地圖導航</a>{LEGAL_FOOTER}</div><div class="action-bar"><a href="tel:{MY_PHONE}" class="btn btn-call">致電 SK-L</a><a href="{MY_LINE_URL}" class="btn btn-line">LINE 諮詢</a></div></div>"""
+        (out/slug/"index.html").write_text(f"<!doctype html><html lang='zh-TW'>{get_head(name + ' | 台中房產推薦', d.get('描述',''))}<body>{detail}</body></html>", encoding="utf-8")
         
-        target = 'target="_blank"' if is_external else ""
-        items.append(f'''
-            <div class="property-card" data-region="{esc(reg)}" data-type="{esc(type_val)}" data-price="{price_val}">
-                <a href="{final_url}" {target}><img src="{img}"></a>
-                <div class="card-info">
-                    <h4>{esc(name)}</h4>
-                    <div class="price">{esc(price_str)}</div>
-                    <div style="font-size:12px; color:#999;">{esc(reg)} • {esc(type_val)}</div>
-                    <a href="{final_url}" {target} style="display:block; text-align:center; margin-top:15px; padding:14px; background:#f8fafc; color:var(--sk-navy); text-decoration:none; font-size:13px; font-weight:700; border-radius:12px;">{'立即開啟外部連結' if is_external else '查看詳情'}</a>
-                </div>
-            </div>
-        ''')
+        is_ext = ext_url.startswith("http")
+        target = 'target="_blank"' if is_ext else ""
+        items.append(f'''<div class="property-card" data-region="{esc(reg)}" data-type="{esc(d.get("用途","住宅"))}" data-price="{re.sub(r'[^\\d.]','',p_str)}"><a href="{f_url}" {target}><img src="{img}"></a><div class="card-info"><h4>{esc(name)}</h4><div class="price">{esc(p_str)}</div><div style="font-size:12px;color:#999;">{esc(reg)} • {esc(d.get("用途","住宅"))}</div><a href="{f_url}" {target} style="display:block;text-align:center;margin-top:15px;padding:14px;background:#f8fafc;color:var(--sk-navy);text-decoration:none;font-size:13px;font-weight:700;border-radius:12px;">{'立即前往物件網頁' if is_ext else '查看詳情'}</a></div></div>''')
 
     reg_btns = ''.join([f'<button class="tag f-reg" data-val="{esc(r)}" onclick="setTag(this, \'f-reg\')">{esc(r)}</button>' for r in sorted(regions)])
     type_btns = ''.join([f'<button class="tag f-type" data-val="{esc(t)}" onclick="setTag(this, \'f-type\')">{esc(t)}</button>' for t in sorted(types)])
 
     home_html = f"""<div class="container"><div class="hero"><div class="hero-content"><h2>{SITE_TITLE}</h2><p>Curated Real Estate • Taichung</p></div></div><div class="map-box"><div id="map"></div></div><div class="filter-section"><div class="filter-group"><button class="tag f-reg active" data-val="all" onclick="setTag(this, 'f-reg')">全部地區</button>{reg_btns}</div><div class="filter-group" style="margin-top:10px;"><button class="tag f-type active" data-val="all" onclick="setTag(this, 'f-type')">所有用途</button>{type_btns}</div><div class="filter-group" style="margin-top:10px; border-top:1px solid #f0f0f0; padding-top:15px;"><button class="tag f-sort active" data-val="none" onclick="setTag(this, 'f-sort')">預設排序</button><button class="tag f-sort" data-val="high" onclick="setTag(this, 'f-sort')">價格：高至低</button><button class="tag f-sort" data-val="low" onclick="setTag(this, 'f-sort')">價格：低至高</button></div></div><div id="list">{''.join(items)}</div>{LEGAL_FOOTER}<div class="action-bar"><a href="tel:{MY_PHONE}" class="btn btn-call">致電 SK-L</a><a href="{MY_LINE_URL}" class="btn btn-line">LINE 諮詢</a></div></div>"""
-    (out/"index.html").write_text(f"<!doctype html><html lang='zh-TW'>{get_head(SITE_TITLE, GA4_ID, True, map_data)}<body>{home_html}</body></html>", encoding="utf-8")
+    (out/"index.html").write_text(f"<!doctype html><html lang='zh-TW'>{get_head(SITE_TITLE, True, map_data)}<body>{home_html}</body></html>", encoding="utf-8")
 
 if __name__ == "__main__": build()

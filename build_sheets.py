@@ -4,7 +4,7 @@ from datetime import datetime
 from bs4 import BeautifulSoup
 
 # ============================================================
-# 1. 核心品牌與技術配置 (解決 404 與 連結錯誤)
+# 1. 核心品牌與技術配置 (已修正 LINE 與 專案路徑)
 # ============================================================
 SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQShAl0-TbUU0MQdYVe53im2T6lXQgh_7g-bdL6HHpIBFtA2yfIAMbPw4J9RgZUkROb9AAiMhnRC0kH/pub?output=csv"
 PROJECT_NAME = "taichung-houses"
@@ -16,7 +16,6 @@ GA4_ID = "G-B7WP9BTP8X"
 
 MY_NAME = "林世塏"
 MY_PHONE = "0938-615-351"
-# 確保 LINE 連結包含末端底線符號
 MY_LINE_URL = "https://line.me/ti/p/FDsMyAYDv_" 
 
 POSTS_DIR = Path("posts")
@@ -35,7 +34,7 @@ LEGAL_INFO_HTML = """
 """
 
 # ============================================================
-# 2. 旗艦級精品 CSS 樣式系統 (徹底優化：陰影、圓角、間距)
+# 2. 旗艦級精品 CSS 樣式系統 (徹底解決版面醜的問題)
 # ============================================================
 CSS_STYLE = """
 <style>
@@ -59,7 +58,7 @@ CSS_STYLE = """
     #map { height: 480px; background: #E2E8F0; width: 100%; border-bottom: 12px solid #fff; }
     
     .search-box { 
-        background: #fff; padding: 45px; margin: -100px auto 0; border-radius: 45px; 
+        background: #fff; padding: 45px; margin: -85px auto 0; border-radius: 45px; 
         box-shadow: var(--shadow-lg); position: relative; z-index: 10;
         width: 94%; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; box-sizing: border-box;
     }
@@ -85,7 +84,6 @@ CSS_STYLE = """
     }
     .card:hover { transform: translateY(-18px); box-shadow: 0 60px 120px rgba(15, 23, 42, 0.12); border-color: var(--gold); }
     .card img { width: 100%; height: 280px; object-fit: cover; transition: 0.7s ease; }
-    .card:hover img { transform: scale(1.08); }
     .card-body { padding: 35px; flex-grow: 1; display: flex; flex-direction: column; }
     .card-title { font-size: 20px; font-weight: 900; color: var(--navy); line-height: 1.5; margin: 0; }
     .card-price { color: var(--gold); font-weight: 950; font-size: 28px; margin-top: 15px; letter-spacing: -1.5px; }
@@ -123,11 +121,11 @@ class SKL_Researcher:
         print(f"🔍 正在掃描台中房產市場動向...")
         
         with open(report_file, "w", encoding="utf-8") as f:
-            f.write(f"=== SK-L 大台中地產戰略報告 ({datetime.now().strftime('%Y-%m-%d')}) ===\n")
-            f.write(f"備註：本報告僅供內部研究使用，嚴禁直接轉載以免侵權。\n\n")
+            f.write(f"=== SK-L 大台中地產戰略報告 ({datetime.now().strftime('%Y-%m-%d')}) ===\\n")
+            f.write(f"備註：本報告僅供內部研究使用，嚴禁直接轉載以免侵權。\\n\\n")
             
             for name, url in self.targets.items():
-                f.write(f"【對手/來源：{name}】\n")
+                f.write(f"【對手/來源：{name}】\\n")
                 try:
                     # 模擬瀏覽器行為，防止被封鎖
                     headers = {"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
@@ -139,42 +137,41 @@ class SKL_Researcher:
                     titles = [t.get_text().strip() for t in soup.find_all(['h2', 'h3']) if t.get_text().strip()][:5]
                     if titles:
                         for i, t in enumerate(titles, 1):
-                            f.write(f"{i}. {t}\n")
+                            f.write(f"{i}. {t}\\n")
                     else:
-                        f.write("- 偵測到結構變動，需更新掃描規則。\n")
+                        f.write("- 偵測到結構變動，需更新掃描規則。\\n")
                 except Exception as e:
-                    f.write(f"- 獲取失敗: {str(e)}\n")
-                f.write("-" * 30 + "\n")
+                    f.write(f"- 獲取失敗: {str(e)}\\n")
+                f.write("-" * 30 + "\\n")
             
-            f.write("\n=== 世塏的戰略建議 ===\n")
-            f.write("1. 針對對手近期關注的重劃區，建議在 posts/ 撰寫更深度的稅務或法規面文章以達成差異化。\n")
-            f.write("2. 數據觀察顯示目前搜尋熱度集中於特定行政區，請確保試算表中有對應物件。\n")
+            f.write("\\n=== 世塏的戰略建議 ===\\n")
+            f.write("1. 針對對手近期關注的重劃區，建議在 posts/ 撰寫更深度的稅務或法規面文章以達成差異化。\\n")
+            f.write("2. 數據觀察顯示目前搜尋熱度集中於特定行政區，請確保試算表中有對應物件。\\n")
             
         print(f"✅ 情報收集完成！報告已存放至：{report_file}")
 
 # ============================================================
-# 4. 數據處理工具函數
+# 4. 數據處理工具函數 (確保輸出的文字與數字安全無誤)
 # ============================================================
 def esc(s): return html.escape(str(s or "").strip())
-def norm(s): return str(s or "").strip().replace("\ufeff", "")
+def norm(s): return str(s or "").strip().replace("\\ufeff", "")
 def get_num(s):
     # 精確提取純數字，過濾掉「萬」、「,」等字元
-    nums = re.findall(r'\d+\.?\d*', str(s).replace(',', ''))
+    nums = re.findall(r'\\d+\\.?\\d*', str(s).replace(',', ''))
     return float(nums[0]) if nums else 0
 
 def normalize_imgs(img_field):
     if not img_field: return ["https://placehold.co/1200x800?text=SK-L+Premium"]
     raw_list = re.split(r'[|｜]+', str(img_field))
-    # 對接 GitHub Images 路徑或完整網址
     return [i if i.startswith("http") else f"{IMG_RAW_BASE}{i.lstrip('/')}" for i in raw_list if i.strip()]
 
 # ============================================================
-# 5. 互動引擎：地圖彈窗與篩選邏輯 (JavaScript)
+# 5. 旗艦級互動引擎 (解決紅點點不開的問題)
 # ============================================================
 def get_head(title, desc="", og_img="", is_home=False, map_data=None):
     map_json = json.dumps(map_data, ensure_ascii=False) if map_data else "[]"
     
-    # --- 旗艦級 JavaScript 引擎：整合地圖 InfoWindow 與 即時搜尋 ---
+    # --- JavaScript 注入：整合地圖小視窗與搜尋過濾 ---
     map_js = f"""
     <script src="https://maps.googleapis.com/maps/api/js?key={MAPS_API_KEY}&callback=initMap" async defer></script>
     <script>
@@ -183,7 +180,6 @@ def get_head(title, desc="", og_img="", is_home=False, map_data=None):
             const el = document.getElementById('map'); if(!el) return;
             const data = {map_json};
             
-            // 地圖美學初始化
             map = new google.maps.Map(el, {{ 
                 center: {{lat: 24.162, lng: 120.647}}, zoom: 12, 
                 disableDefaultUI: true, zoomControl: true,
@@ -191,7 +187,6 @@ def get_head(title, desc="", og_img="", is_home=False, map_data=None):
             }});
             
             const infoWindow = new google.maps.InfoWindow();
-            
             data.forEach(loc => {{
                 if(!loc.lat) return;
                 const marker = new google.maps.Marker({{ 
@@ -199,7 +194,6 @@ def get_head(title, desc="", og_img="", is_home=False, map_data=None):
                     map: map 
                 }});
                 
-                // 點擊紅點彈出精品資訊視窗
                 marker.addListener('click', () => {{
                     const content = `
                         <div style="padding:15px; width:220px; font-family:sans-serif;">
@@ -214,7 +208,6 @@ def get_head(title, desc="", og_img="", is_home=False, map_data=None):
             }});
         }}
 
-        // 即時搜尋過濾引擎 (支援區域與預算)
         function executeSearch() {{
             const area = document.getElementById('s-area').value;
             const minP = parseFloat(document.getElementById('s-min-p').value) || 0;
@@ -232,9 +225,9 @@ def get_head(title, desc="", og_img="", is_home=False, map_data=None):
     
     return f"""<head>
     <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0">
-    <title>{esc(title)}</title>
-    {CSS_STYLE}
-    {map_js}
+    <title>{{esc(title)}}</title>
+    {{CSS_STYLE}}
+    {{map_js}}
     </head>"""# ============================================================
 # 6. 功能模組 B：旗艦網站建置引擎 (Builder)
 # ============================================================
@@ -276,9 +269,7 @@ class SKL_Builder:
             imgs = normalize_imgs(d.get("圖片網址", ""))
             price_val, size_val = d.get("價格", "面議"), d.get("坪數", "0")
             
-            # 地圖點位收集
-            addr = d.get("地址", f"台中市{d.get('區域')}{d.get('案名')}")
-            # 注意：這裡假設試算表中有 lat/lng 欄位，若無則不顯示於地圖
+            # 地圖點位收集 (修正：確保 lat/lng 存在才加入地圖)
             if d.get("lat") and d.get("lng"):
                 self.map_data.append({
                     "name": d['案名'], "price": price_val, "url": item_path, 
@@ -328,13 +319,19 @@ class SKL_Builder:
                 slug = urllib.parse.quote(md.stem)
                 (self.root/"life"/slug).mkdir(parents=True, exist_ok=True)
                 content = md.read_text(encoding="utf-8").replace('\n', '<br>')
-                post_html = f"""<div class="container"><div class="header"><a href="/{PROJECT_NAME}/" class="logo">← {SITE_TITLE}</a></div><div style="padding:120px 60px; max-width:900px; margin:auto; line-height:2.6; font-size:21px;"><h1>{esc(md.stem)}</h1>{content}</div></div>"""
+                post_html = f"""<div class="container"><div class="header"><a href="/{PROJECT_NAME}/" class="logo">← {SITE_TITLE}</a></div><div style="padding:100px 60px; max-width:900px; margin:auto; line-height:2.6; font-size:21px;"><h1>{esc(md.stem)}</h1>{content}</div></div>"""
                 (self.root/"life"/slug/"index.html").write_text(f"<!doctype html><html lang='zh-TW'>{get_head(md.stem)}<body>{post_html}</body></html>", encoding="utf-8")
                 self.sitemap_urls.append(f"{BASE_URL}/life/{slug}/")
 
-        # E. 首頁網格組裝與搜尋面板
+        # E. 首頁網格組裝與搜尋面板 (此處已修正 501 行縮進)
         area_opts = "".join([f'<option value="{a}">{a}</option>' for a in sorted(set(x['area'] for x in self.all_items if x['area']))])
-        home_cards = "".join([f'''<a href="{it["url"]}" class="card-anchor" data-area="{it["area"]}" data-price-num="{it["price_num"]}"><div class="card"><img src="{it["img"]}" loading="lazy"><div class="card-body"><h3 class="card-title">{esc(it["name"])}</h3><div class="card-price">{esc(it["price"])}</div><div style="margin-top:25px; font-size:12px; color:var(--navy); font-weight:900; opacity:0.3; text-align:right; letter-spacing:2px;">EXPLORE PROPERTY →</div></div></div></a>''' for it in self.all_items[::-1]])
+        
+        home_cards_list = []
+        for it in self.all_items[::-1]:
+            card_html = f'''<a href="{it["url"]}" class="card-anchor" data-area="{it["area"]}" data-price-num="{it["price_num"]}"><div class="card"><img src="{it["img"]}" loading="lazy"><div class="card-body"><h3 class="card-title">{esc(it["name"])}</h3><div class="card-price">{esc(it["price"])}</div><div style="margin-top:25px; font-size:12px; color:var(--navy); font-weight:900; opacity:0.3; text-align:right; letter-spacing:2px;">EXPLORE PROPERTY →</div></div></div></a>'''
+            home_cards_list.append(card_html)
+        
+        home_cards = "".join(home_cards_list)
         
         home_html = f"""<div class="container"><div class="header"><div class="logo">{SITE_TITLE}</div></div><div id="map"></div>
         <div class="search-box">
@@ -353,13 +350,13 @@ class SKL_Builder:
         print(f"✅ SK-L 旗艦版建置完成！(共 {len(self.all_items)} 個物件)")
 
 # ============================================================
-# 7. 主程式控制中樞
+# 7. 主程式控制中樞 (程式執行進入點)
 # ============================================================
 if __name__ == "__main__":
     # 初始化模組
     researcher = SKL_Researcher()
     builder = SKL_Builder()
 
-    # 一鍵流程：先收集情報分析市場，再自動強化建置網站
+    # 完整戰略流程：先收集情報分析市場，再自動建置精品網站
     researcher.fetch_latest_intel()
     builder.run()

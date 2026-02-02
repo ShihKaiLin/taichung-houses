@@ -44,25 +44,19 @@ CSS_STYLE = """
         --primary: #1A1C1E; /* 極致深石板黑 */
         --accent: #C5A059;  /* 霧面香檳金 */
         --bg: #FDFDFD;      /* 純淨藝廊白 */
-        --card-bg: #FFFFFF;
         --text-main: #2C2E30;
-        --text-sub: #6B7280;
         --ease: cubic-bezier(0.2, 1, 0.3, 1);
     }
 
     body { font-family: 'Inter', 'Noto Sans TC', sans-serif; margin: 0; background: var(--bg); color: var(--text-main); -webkit-font-smoothing: antialiased; }
     
-    /* 容器：拿掉生硬邊框，改用微妙的空間感 */
     .container { width: 100%; max-width: 1400px; margin: auto; background: #fff; min-height: 100vh; position: relative; padding-bottom: 180px; }
     
-    /* Header：改為極簡透明感 */
     .header { background: rgba(255,255,255,0.85); backdrop-filter: blur(20px); padding: 30px 60px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid rgba(0,0,0,0.05); }
     .logo { font-weight: 800; font-size: 22px; letter-spacing: 4px; color: var(--primary); text-decoration: none; text-transform: uppercase; }
 
-    /* 地圖：讓它像是一幅畫嵌入網頁 */
-    #map { height: 550px; background: #f0f0f0; width: 100%; filter: grayscale(15%); transition: 0.5s; }
+    #map { height: 500px; background: #f0f0f0; width: 100%; filter: grayscale(15%); border-bottom: 1px solid #eee; }
     
-    /* 搜尋面板：改為「漂浮氣墊」感，縮小體積，增加輕盈度 */
     .search-box { 
         background: #FFFFFF; padding: 35px 50px; margin: -60px auto 0; border-radius: 30px; 
         box-shadow: 0 30px 80px rgba(0,0,0,0.08); position: relative; z-index: 10;
@@ -70,57 +64,25 @@ CSS_STYLE = """
     }
     .search-item { flex: 1; min-width: 180px; display: flex; flex-direction: column; gap: 10px; }
     .search-label { font-size: 10px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; }
-    .search-select, .search-input { 
-        padding: 15px 0; border: none; border-bottom: 1.5px solid #E5E7EB; font-size: 16px; 
-        background: transparent; outline: none; transition: 0.3s; font-weight: 500;
-    }
-    .search-select:focus, .search-input:focus { border-color: var(--accent); }
-    .search-btn { 
-        background: var(--primary); color: #fff; border: none; padding: 18px 45px; border-radius: 12px; 
-        font-weight: 700; font-size: 15px; cursor: pointer; transition: 0.3s; letter-spacing: 1px;
-    }
+    .search-select, .search-input { padding: 15px 0; border: none; border-bottom: 1.5px solid #E5E7EB; font-size: 16px; background: transparent; outline: none; transition: 0.3s; font-weight: 500; }
+    .search-btn { background: var(--primary); color: #fff; border: none; padding: 18px 45px; border-radius: 12px; font-weight: 700; font-size: 15px; cursor: pointer; transition: 0.3s; }
     .search-btn:hover { background: var(--accent); transform: translateY(-2px); box-shadow: 0 10px 30px rgba(197, 160, 89, 0.3); }
 
-    /* 物件網格：增加間距，讓每個房子都有尊榮感 */
     .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 60px; padding: 100px 60px; }
     
-    /* 卡片：捨棄大圓角，改用經典的「微圓角」與平面化設計 */
-    .card { 
-        overflow: hidden; background: #fff; display: flex; flex-direction: column; 
-        height: 100%; transition: var(--ease); text-decoration: none; color: inherit;
-    }
+    .card { overflow: hidden; background: #fff; display: flex; flex-direction: column; transition: var(--ease); text-decoration: none; color: inherit; }
     .card:hover { transform: translateY(-10px); }
-    .card-img-wrapper { position: relative; width: 100%; height: 300px; overflow: hidden; border-radius: 4px; }
-    .card img { width: 100%; height: 100%; object-fit: cover; transition: 1.2s var(--ease); }
-    .card:hover img { transform: scale(1.05); }
-    
-    .card-body { padding: 30px 0; flex-grow: 1; }
-    .card-area { font-size: 11px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 2.5px; margin-bottom: 12px; }
+    .card img { width: 100%; height: 300px; object-fit: cover; border-radius: 4px; transition: 1.2s var(--ease); }
+    .card-body { padding: 30px 0; }
+    .card-area { font-size: 11px; font-weight: 700; color: var(--accent); letter-spacing: 2.5px; margin-bottom: 12px; text-transform: uppercase; }
     .card-title { font-size: 22px; font-weight: 700; color: var(--primary); line-height: 1.4; margin: 0; }
-    .card-price { color: var(--primary); font-weight: 300; font-size: 32px; margin-top: 15px; display: flex; align-items: baseline; gap: 4px; }
-    .card-price::after { content: '萬'; font-size: 14px; font-weight: 600; }
+    .card-price { color: var(--primary); font-weight: 300; font-size: 32px; margin-top: 15px; }
+    .card-price::after { content: '萬'; font-size: 14px; font-weight: 600; margin-left: 4px; }
     
-    .badge { display: inline-block; padding: 6px 14px; border: 1px solid #E5E7EB; color: #9CA3AF; border-radius: 4px; font-size: 11px; font-weight: 600; margin: 0 8px 8px 0; }
-    
-    /* 底部行動 Bar：改為更輕量的精品懸浮感 */
-    .action-bar { 
-        position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 600px; 
-        padding: 15px; display: flex; gap: 15px; background: rgba(26, 28, 30, 0.95); backdrop-filter: blur(15px); 
-        border-radius: 20px; z-index: 10000; box-shadow: 0 25px 50px rgba(0,0,0,0.3);
-    }
+    .action-bar { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 600px; padding: 15px; display: flex; gap: 15px; background: rgba(26, 28, 30, 0.95); backdrop-filter: blur(15px); border-radius: 20px; z-index: 10000; box-shadow: 0 25px 50px rgba(0,0,0,0.3); }
     .btn { flex: 1; text-align: center; padding: 18px; border-radius: 12px; text-decoration: none; font-weight: 700; color: #fff; font-size: 15px; transition: 0.3s; }
     .btn-call { background: transparent; border: 1px solid rgba(255,255,255,0.2); }
     .btn-line { background: #06C755; }
-    .btn:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
-
-    /* 手機版優化 */
-    @media (max-width: 768px) {
-        .header { padding: 20px; }
-        .logo { font-size: 18px; }
-        .search-box { width: 92%; padding: 30px; margin-top: -40px; }
-        .grid { grid-template-columns: 1fr; padding: 60px 20px; gap: 40px; }
-        #map { height: 350px; }
-    }
 </style>
 """
 """# ============================================================
@@ -384,4 +346,5 @@ if __name__ == "__main__":
     # 完整戰略流程：先收集情報分析市場，再自動建置精品網站
     researcher.fetch_latest_intel()
     builder.run()
+
 

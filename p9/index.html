@@ -1,43 +1,32 @@
-<!doctype html><html lang='zh-TW'><head>
-    <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0">
-    <title>{esc(title)}</title>
-    {CSS_STYLE}
-    {map_js}
-    </head><body><div class="container">
-                <div class="header"><a href="/taichung-houses/" class="logo">SK-L</a></div>
-                <div style="height:600px; overflow:hidden;"><img src="https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/x10.jpg" style="width:100%; height:100%; object-fit:cover;"></div>
-                <div style="padding:100px 60px;">
-                    <div class="card-area">LUXURY RESIDENCE</div>
-                    <h1 style="font-size:52px; font-weight:800; color:var(--primary); margin:0 0 20px; letter-spacing:-2px;">逢甲商辦 K010</h1>
-                    <div style="font-size:64px; color:var(--primary); font-weight:300; margin-bottom:60px;">3,800 萬<span style="font-size:18px; font-weight:600; margin-left:8px;">萬</span></div>
-                    
-                    <div style="margin-bottom:60px; display:flex; gap:15px; flex-wrap:wrap;">
-                        <span class="badge">📍 西屯區</span>
-                        <span class="badge">📐 0坪</span>
-                    </div>
-
-                    <div style="line-height:2.6; font-size:20px; color:#4B5563; border-top:1px solid #EEE; padding-top:60px; margin-bottom:80px;">
-                        <div style="font-weight:700; color:var(--primary); margin-bottom:30px; font-size:24px; letter-spacing:1px;">顧問置產分析 Report</div>
-                        人潮多<br>• 黃金地段<br>• 現成租客
-                    </div>
-
-                    <div style="padding:60px; border-radius:24px; background:#F9FAFB; border:1px solid #F3F4F6;">
-                        <div style="display:flex; align-items:center; gap:30px; margin-bottom:30px;">
-                            <img src="https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/agent_photo.jpg" style="width:90px; height:90px; border-radius:50%; object-fit:cover;" onerror="this.src='https://placehold.co/150x150?text=SK-L'">
-                            <div>
-                                <div style="font-size:28px; font-weight:800; color:var(--primary);">林世塏</div>
-                                <div style="font-size:15px; color:var(--accent); font-weight:700; letter-spacing:1px;">大台中地產置產顧問</div>
-                            </div>
-                        </div>
-                        
-<div style="margin-top: 35px; padding-top: 25px; border-top: 1.5px solid #edf2f7; font-size: 11px; color: #94a3b8; line-height: 2.4; font-weight: 500;">
-    📍 英柏國際地產有限公司<br>
-    中市地價二字第 1070029259 號<br>
-    經紀人：王一媖 (103) 中市經紀字第 00678 號
-</div>
-
-                        <a href="https://line.me/ti/p/FDsMyAYDv_" target="_blank" style="display:block; background:#06C755; color:#fff; text-decoration:none; text-align:center; padding:22px; border-radius:12px; font-weight:700; margin-top:40px; font-size:18px; transition:0.3s;">💬 索取完整物件分析報告</a>
-                    </div>
-                </div>
-                <div class="action-bar"><a class="btn btn-call" href="tel:0938-615-351">📞 服務專線</a><a class="btn btn-line" href="https://line.me/ti/p/FDsMyAYDv_" target="_blank">💬 LINE 諮詢</a></div>
-            </div></body></html>
+<!DOCTYPE html><html lang="zh-TW"><head><meta charset="utf-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1"><title>逢甲商辦 K010</title>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;600;900&family=Noto+Sans+TC:wght@300;500;900&display=swap');
+    :root { --p: #0F172A; --a: #B59461; --bg: #F8FAFC; }
+    body { font-family: 'Inter', 'Noto Sans TC', sans-serif; margin:0; background:var(--bg); color:var(--p); }
+    .header { position:sticky; top:0; z-index:2000; background:rgba(255,255,255,0.9); backdrop-filter:blur(15px); padding:20px 50px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(0,0,0,0.05); }
+    .logo { font-weight:900; font-size:22px; letter-spacing:4px; color:var(--p); text-decoration:none; }
+    #map { height:500px; width:100%; filter: grayscale(30%); }
+    .search-bar { width:90%; max-width:1000px; margin:-40px auto 0; position:relative; z-index:1500; background:#fff; padding:30px; border-radius:20px; box-shadow:0 20px 50px rgba(0,0,0,0.1); display:flex; gap:20px; align-items:flex-end; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(350px, 1fr)); gap:40px; padding:80px 50px; }
+    .card { background:#fff; border-radius:12px; overflow:hidden; transition:0.4s; text-decoration:none; color:inherit; box-shadow:0 10px 30px rgba(0,0,0,0.05); }
+    .card:hover { transform:translateY(-10px); box-shadow:0 20px 40px rgba(0,0,0,0.1); }
+    .card img { width:100%; height:280px; object-fit:cover; }
+    .card-body { padding:20px; }
+    .card-title { font-size:20px; font-weight:900; margin:10px 0; }
+    .card-price { font-size:28px; color:var(--a); font-weight:300; }
+    .action-bar { position:fixed; bottom:30px; left:50%; transform:translateX(-50%); width:90%; max-width:500px; padding:10px; display:flex; gap:10px; background:var(--p); border-radius:15px; z-index:3000; box-shadow:0 20px 40px rgba(0,0,0,0.3); }
+    .btn { flex:1; text-align:center; padding:15px; border-radius:10px; text-decoration:none; font-weight:900; font-size:14px; color:#fff; }
+    .btn-line { background:#06C755; }
+</style>
+</head>
+        <body>
+            <div class="header"><a href="/taichung-houses/" class="logo">SK-L</a></div>
+            <img src="https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/x10.jpg" style="width:100%;height:450px;object-fit:cover;">
+            <div style="padding:50px 30px;max-width:800px;margin:auto;">
+                <h1 style="font-size:40px;">逢甲商辦 K010</h1>
+                <div style="font-size:50px;color:var(--a);">3,800 萬萬</div>
+                <p style="font-size:18px;line-height:2;margin-top:30px;">人潮多、黃金地段、現成租客</p>
+            </div>
+            <div class="action-bar"><a class="btn" href="tel:0938-615-351">📞 聯絡諮詢</a><a class="btn btn-line" href="https://line.me/ti/p/FDsMyAYDv_">💬 LINE 詢問</a></div>
+            </body></html>

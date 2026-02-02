@@ -1,143 +1,118 @@
-<!doctype html><html lang='zh-TW'><head>
-    <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0">
-    <title>{esc(title)}</title>
-    {CSS_STYLE}
-    {map_js}
-    </head><body><div class="container">
-            <div class="header"><div class="logo">SK-L 大台中房地產</div></div>
-            <div id="map"></div>
-            <div class="search-box">
-                <div class="search-item">
-                    <label class="search-label">行政區域 Location</label>
-                    <select class="search-select" id="s-area"><option value="all">台中全區</option><option value="北屯區">北屯區</option><option value="南區">南區</option><option value="南屯區">南屯區</option><option value="大里區">大里區</option><option value="沙鹿區">沙鹿區</option><option value="西區">西區</option><option value="西屯區">西屯區</option><option value="豐原區">豐原區</option></select>
-                </div>
-                <div class="search-item">
-                    <label class="search-label">預算範圍 Budget (萬)</label>
-                    <div style="display:flex;gap:15px;"><input class="search-input" id="s-min-p" placeholder="最低"><input class="search-input" id="s-max-p" placeholder="最高"></div>
-                </div>
-                <button class="search-btn" onclick="executeSearch()">🔍 搜尋物件</button>
-            </div>
-            <div id="list-start"></div>
-            <div class="grid">
-        <a href="/taichung-houses/p11/" class="card-anchor" data-area="大里區" data-price-num="2990.0">
-            <div class="card">
-                <div class="card-img-wrapper"><img src="https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/d12.jpg" loading="lazy" alt="新時代別墅 M012"></div>
-                <div class="card-body">
-                    <div class="card-area">大里區</div>
-                    <h3 class="card-title">新時代別墅 M012</h3>
-                    <div class="card-price">2,990 萬</div>
-                </div>
-            </div>
-        </a>
-        <a href="/taichung-houses/p10/" class="card-anchor" data-area="南屯區" data-price-num="1350.0">
-            <div class="card">
-                <div class="card-img-wrapper"><img src="https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/n11.jpg" loading="lazy" alt="五期美寓 L011"></div>
-                <div class="card-body">
-                    <div class="card-area">南屯區</div>
-                    <h3 class="card-title">五期美寓 L011</h3>
-                    <div class="card-price">1,350 萬</div>
-                </div>
-            </div>
-        </a>
-        <a href="/taichung-houses/p9/" class="card-anchor" data-area="西屯區" data-price-num="3800.0">
-            <div class="card">
-                <div class="card-img-wrapper"><img src="https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/x10.jpg" loading="lazy" alt="逢甲商辦 K010"></div>
-                <div class="card-body">
-                    <div class="card-area">西屯區</div>
-                    <h3 class="card-title">逢甲商辦 K010</h3>
-                    <div class="card-price">3,800 萬</div>
-                </div>
-            </div>
-        </a>
-        <a href="/taichung-houses/p8/" class="card-anchor" data-area="沙鹿區" data-price-num="450.0">
-            <div class="card">
-                <div class="card-img-wrapper"><img src="https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/s09.jpg" loading="lazy" alt="靜宜學區套房 J009"></div>
-                <div class="card-body">
-                    <div class="card-area">沙鹿區</div>
-                    <h3 class="card-title">靜宜學區套房 J009</h3>
-                    <div class="card-price">450 萬</div>
-                </div>
-            </div>
-        </a>
-        <a href="/taichung-houses/p7/" class="card-anchor" data-area="北屯區" data-price-num="2150.0">
-            <div class="card">
-                <div class="card-img-wrapper"><img src="https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/b08.jpg" loading="lazy" alt="水岸華廈 I008"></div>
-                <div class="card-body">
-                    <div class="card-area">北屯區</div>
-                    <h3 class="card-title">水岸華廈 I008</h3>
-                    <div class="card-price">2,150 萬</div>
-                </div>
-            </div>
-        </a>
-        <a href="/taichung-houses/p6/" class="card-anchor" data-area="大里區" data-price-num="680.0">
-            <div class="card">
-                <div class="card-img-wrapper"><img src="https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/d07.jpg" loading="lazy" alt="首購公寓 H007"></div>
-                <div class="card-body">
-                    <div class="card-area">大里區</div>
-                    <h3 class="card-title">首購公寓 H007</h3>
-                    <div class="card-price">680 萬</div>
-                </div>
-            </div>
-        </a>
-        <a href="/taichung-houses/p5/" class="card-anchor" data-area="豐原區" data-price-num="1650.0">
-            <div class="card">
-                <div class="card-img-wrapper"><img src="https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/f06.jpg" loading="lazy" alt="田園透天 G006"></div>
-                <div class="card-body">
-                    <div class="card-area">豐原區</div>
-                    <h3 class="card-title">田園透天 G006</h3>
-                    <div class="card-price">1,650 萬</div>
-                </div>
-            </div>
-        </a>
-        <a href="/taichung-houses/p4/" class="card-anchor" data-area="南屯區" data-price-num="1698.0">
-            <div class="card">
-                <div class="card-img-wrapper"><img src="https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/n05.jpg" loading="lazy" alt="文心森林公園【大有可為】3+1房附休旅車位捷運宅"></div>
-                <div class="card-body">
-                    <div class="card-area">南屯區</div>
-                    <h3 class="card-title">文心森林公園【大有可為】3+1房附休旅車位捷運宅</h3>
-                    <div class="card-price">1698萬</div>
-                </div>
-            </div>
-        </a>
-        <a href="/taichung-houses/p3/" class="card-anchor" data-area="南區" data-price-num="1766.0">
-            <div class="card">
-                <div class="card-img-wrapper"><img src="https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/YA0045896-1.jpg" loading="lazy" alt="中山醫大慶捷運站之悠森學首購好宅"></div>
-                <div class="card-body">
-                    <div class="card-area">南區</div>
-                    <h3 class="card-title">中山醫大慶捷運站之悠森學首購好宅</h3>
-                    <div class="card-price">1766萬</div>
-                </div>
-            </div>
-        </a>
-        <a href="/taichung-houses/p2/" class="card-anchor" data-area="西區" data-price-num="2188.0">
-            <div class="card">
-                <div class="card-img-wrapper"><img src="https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/h03.jpg" loading="lazy" alt="國美特區【宏台美術館】高樓層優質三房B1平車"></div>
-                <div class="card-body">
-                    <div class="card-area">西區</div>
-                    <h3 class="card-title">國美特區【宏台美術館】高樓層優質三房B1平車</h3>
-                    <div class="card-price">2188萬</div>
-                </div>
-            </div>
-        </a>
-        <a href="/taichung-houses/p1/" class="card-anchor" data-area="沙鹿區" data-price-num="2758.0">
-            <div class="card">
-                <div class="card-img-wrapper"><img src="https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/h02.jpg" loading="lazy" alt="專任沙鹿北勢國小過洋居全新電梯雙車別墅C10"></div>
-                <div class="card-body">
-                    <div class="card-area">沙鹿區</div>
-                    <h3 class="card-title">專任沙鹿北勢國小過洋居全新電梯雙車別墅C10</h3>
-                    <div class="card-price">2,758 萬</div>
-                </div>
-            </div>
-        </a>
-        <a href="/taichung-houses/p0/" class="card-anchor" data-area="沙鹿區" data-price-num="2798.0">
-            <div class="card">
-                <div class="card-img-wrapper"><img src="https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/h01.jpg" loading="lazy" alt="專任沙鹿北勢國小過洋居全新電梯雙車別墅C1"></div>
-                <div class="card-body">
-                    <div class="card-area">沙鹿區</div>
-                    <h3 class="card-title">專任沙鹿北勢國小過洋居全新電梯雙車別墅C1</h3>
-                    <div class="card-price">2,798萬</div>
-                </div>
-            </div>
-        </a></div>
-            <div class="action-bar"><a class="btn btn-call" href="tel:0938-615-351">📞 立即撥打</a><a class="btn btn-line" href="https://line.me/ti/p/FDsMyAYDv_" target="_blank">💬 LINE 諮詢</a></div>
-        </div></body></html>
+<!DOCTYPE html><html lang="zh-TW"><head><meta charset="utf-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1"><title>SK-L 大台中地產</title>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;600;900&family=Noto+Sans+TC:wght@300;500;900&display=swap');
+    :root { --p: #0F172A; --a: #B59461; --bg: #F8FAFC; }
+    body { font-family: 'Inter', 'Noto Sans TC', sans-serif; margin:0; background:var(--bg); color:var(--p); }
+    .header { position:sticky; top:0; z-index:2000; background:rgba(255,255,255,0.9); backdrop-filter:blur(15px); padding:20px 50px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(0,0,0,0.05); }
+    .logo { font-weight:900; font-size:22px; letter-spacing:4px; color:var(--p); text-decoration:none; }
+    #map { height:500px; width:100%; filter: grayscale(30%); }
+    .search-bar { width:90%; max-width:1000px; margin:-40px auto 0; position:relative; z-index:1500; background:#fff; padding:30px; border-radius:20px; box-shadow:0 20px 50px rgba(0,0,0,0.1); display:flex; gap:20px; align-items:flex-end; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(350px, 1fr)); gap:40px; padding:80px 50px; }
+    .card { background:#fff; border-radius:12px; overflow:hidden; transition:0.4s; text-decoration:none; color:inherit; box-shadow:0 10px 30px rgba(0,0,0,0.05); }
+    .card:hover { transform:translateY(-10px); box-shadow:0 20px 40px rgba(0,0,0,0.1); }
+    .card img { width:100%; height:280px; object-fit:cover; }
+    .card-body { padding:20px; }
+    .card-title { font-size:20px; font-weight:900; margin:10px 0; }
+    .card-price { font-size:28px; color:var(--a); font-weight:300; }
+    .action-bar { position:fixed; bottom:30px; left:50%; transform:translateX(-50%); width:90%; max-width:500px; padding:10px; display:flex; gap:10px; background:var(--p); border-radius:15px; z-index:3000; box-shadow:0 20px 40px rgba(0,0,0,0.3); }
+    .btn { flex:1; text-align:center; padding:15px; border-radius:10px; text-decoration:none; font-weight:900; font-size:14px; color:#fff; }
+    .btn-line { background:#06C755; }
+</style>
+
+            <script src="https://maps.googleapis.com/maps/api/js?key=&callback=initMap" async defer></script>
+            <script>
+                function initMap() {
+                    const map = new google.maps.Map(document.getElementById('map'), {
+                        center: {lat: 24.162, lng: 120.647}, zoom: 13,
+                        styles: [{"featureType":"all","stylers":[{"saturation":-80}]}]
+                    });
+                    const iw = new google.maps.InfoWindow();
+                    const pts = [];
+                    pts.forEach(p => {
+                        if(!p.lat) return;
+                        const m = new google.maps.Marker({ position:{lat:parseFloat(p.lat), lng:parseFloat(p.lng)}, map:map });
+                        m.addListener('click', () => {
+                            iw.setContent(`<div style="padding:10px;width:150px;"><img src="${p.img}" style="width:100%"><h4 style="margin:5px 0">${p.name}</h4><div style="color:#B59461;font-weight:900">${p.price}萬</div><a href="${p.url}" style="font-size:12px">點擊查看</a></div>`);
+                            iw.open(map, m);
+                        });
+                    });
+                }
+                function doSearch() {
+                    const a = document.getElementById('s-area').value;
+                    document.querySelectorAll('.card-anchor').forEach(c => {
+                        c.style.display = (a === 'all' || c.dataset.area === a) ? 'block' : 'none';
+                    });
+                }
+            </script></head>
+        <body>
+        <div class="header"><div class="logo">SK-L 大台中地產戰略</div></div>
+        <div id="map"></div>
+        <div class="search-bar">
+            <div style="flex:1"><label style="font-size:11px;font-weight:900">區域</label>
+            <select id="s-area" style="width:100%;padding:10px;border:none;border-bottom:1px solid #ddd"><option value="all">台中全區</option><option value="北屯區">北屯區</option><option value="南區">南區</option><option value="南屯區">南屯區</option><option value="大里區">大里區</option><option value="沙鹿區">沙鹿區</option><option value="西區">西區</option><option value="西屯區">西屯區</option><option value="豐原區">豐原區</option></select></div>
+            <button onclick="doSearch()" style="background:var(--p);color:#fff;border:none;padding:12px 30px;border-radius:8px;cursor:pointer">搜尋</button>
+        </div>
+        <div class="grid"><a href="/taichung-houses/p11/" class="card-anchor" data-area="大里區">
+                <div class="card"><img src="https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/d12.jpg"><div class="card-body">
+                <div style="font-size:12px;color:var(--a);font-weight:900">大里區</div>
+                <div class="card-title">新時代別墅 M012</div>
+                <div class="card-price">2,990 萬萬</div>
+                </div></div></a><a href="/taichung-houses/p10/" class="card-anchor" data-area="南屯區">
+                <div class="card"><img src="https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/n11.jpg"><div class="card-body">
+                <div style="font-size:12px;color:var(--a);font-weight:900">南屯區</div>
+                <div class="card-title">五期美寓 L011</div>
+                <div class="card-price">1,350 萬萬</div>
+                </div></div></a><a href="/taichung-houses/p9/" class="card-anchor" data-area="西屯區">
+                <div class="card"><img src="https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/x10.jpg"><div class="card-body">
+                <div style="font-size:12px;color:var(--a);font-weight:900">西屯區</div>
+                <div class="card-title">逢甲商辦 K010</div>
+                <div class="card-price">3,800 萬萬</div>
+                </div></div></a><a href="/taichung-houses/p8/" class="card-anchor" data-area="沙鹿區">
+                <div class="card"><img src="https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/s09.jpg"><div class="card-body">
+                <div style="font-size:12px;color:var(--a);font-weight:900">沙鹿區</div>
+                <div class="card-title">靜宜學區套房 J009</div>
+                <div class="card-price">450 萬萬</div>
+                </div></div></a><a href="/taichung-houses/p7/" class="card-anchor" data-area="北屯區">
+                <div class="card"><img src="https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/b08.jpg"><div class="card-body">
+                <div style="font-size:12px;color:var(--a);font-weight:900">北屯區</div>
+                <div class="card-title">水岸華廈 I008</div>
+                <div class="card-price">2,150 萬萬</div>
+                </div></div></a><a href="/taichung-houses/p6/" class="card-anchor" data-area="大里區">
+                <div class="card"><img src="https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/d07.jpg"><div class="card-body">
+                <div style="font-size:12px;color:var(--a);font-weight:900">大里區</div>
+                <div class="card-title">首購公寓 H007</div>
+                <div class="card-price">680 萬萬</div>
+                </div></div></a><a href="/taichung-houses/p5/" class="card-anchor" data-area="豐原區">
+                <div class="card"><img src="https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/f06.jpg"><div class="card-body">
+                <div style="font-size:12px;color:var(--a);font-weight:900">豐原區</div>
+                <div class="card-title">田園透天 G006</div>
+                <div class="card-price">1,650 萬萬</div>
+                </div></div></a><a href="/taichung-houses/p4/" class="card-anchor" data-area="南屯區">
+                <div class="card"><img src="https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/n05.jpg"><div class="card-body">
+                <div style="font-size:12px;color:var(--a);font-weight:900">南屯區</div>
+                <div class="card-title">文心森林公園【大有可為】3+1房附休旅車位捷運宅</div>
+                <div class="card-price">1698萬萬</div>
+                </div></div></a><a href="/taichung-houses/p3/" class="card-anchor" data-area="南區">
+                <div class="card"><img src="https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/YA0045896-1.jpg"><div class="card-body">
+                <div style="font-size:12px;color:var(--a);font-weight:900">南區</div>
+                <div class="card-title">中山醫大慶捷運站之悠森學首購好宅</div>
+                <div class="card-price">1766萬萬</div>
+                </div></div></a><a href="/taichung-houses/p2/" class="card-anchor" data-area="西區">
+                <div class="card"><img src="https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/h03.jpg"><div class="card-body">
+                <div style="font-size:12px;color:var(--a);font-weight:900">西區</div>
+                <div class="card-title">國美特區【宏台美術館】高樓層優質三房B1平車</div>
+                <div class="card-price">2188萬萬</div>
+                </div></div></a><a href="/taichung-houses/p1/" class="card-anchor" data-area="沙鹿區">
+                <div class="card"><img src="https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/h02.jpg"><div class="card-body">
+                <div style="font-size:12px;color:var(--a);font-weight:900">沙鹿區</div>
+                <div class="card-title">專任沙鹿北勢國小過洋居全新電梯雙車別墅C10</div>
+                <div class="card-price">2,758 萬萬</div>
+                </div></div></a><a href="/taichung-houses/p0/" class="card-anchor" data-area="沙鹿區">
+                <div class="card"><img src="https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/h01.jpg"><div class="card-body">
+                <div style="font-size:12px;color:var(--a);font-weight:900">沙鹿區</div>
+                <div class="card-title">專任沙鹿北勢國小過洋居全新電梯雙車別墅C1</div>
+                <div class="card-price">2,798萬萬</div>
+                </div></div></a></div>
+        <div class="action-bar"><a class="btn" href="tel:0938-615-351">📞 立即撥打</a><a class="btn btn-line" href="https://line.me/ti/p/FDsMyAYDv_">💬 LINE 諮詢</a></div>
+        </body></html>

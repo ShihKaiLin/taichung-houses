@@ -1,34 +1,42 @@
-name: Cloud Sync Deploy
+name: Deploy SK-L Premium Real Estate Site
+
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: '0 0 * * *' # 每天凌晨自動更新一次資料
+  workflow_dispatch: # 允許手動點擊按鈕更新
+
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
+
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v3
+
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v4
         with:
           python-version: '3.9'
+
       - name: Install dependencies
-        run: pip install requests
-      - name: Build Site
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests beautifulsoup4
+
+      - name: Run build script
+        env:
+          MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
         run: python build_sheets.py
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-         path: '.'
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
+
       - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./
+          publish_branch: gh-pages

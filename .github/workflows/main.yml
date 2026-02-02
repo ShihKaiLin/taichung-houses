@@ -2,11 +2,8 @@ name: Deploy SK-L Premium Real Estate Site
 
 on:
   push:
-    branches:
-      - main
-  schedule:
-    - cron: '0 0 * * *' # 每天凌晨自動更新一次資料
-  workflow_dispatch: # 允許手動點擊按鈕更新
+    branches: [ main ]
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -14,26 +11,17 @@ permissions:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.9'
-
       - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install requests beautifulsoup4
-
-      - name: Run build script
+        run: pip install requests beautifulsoup4
+      - name: Build Site
         env:
           MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
         run: python build_sheets.py
-
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:

@@ -1,13 +1,104 @@
-<!doctype html><html><head><meta name='viewport' content='width=device-width,initial-scale=1'></head><body style='margin:0; background:#f5f5f5;'>
-        <div style='padding:20px; font-family:sans-serif; max-width:500px; margin:auto; background:#fff;'>
-            <img src="https://picsum.photos/400/300" style="width:100%; border-radius:10px;">
-            <h1 style='font-size:22px; margin-top:15px;'>美術館豪邸</h1>
-            <p style='color:#e67e22; font-size:24px; font-weight:bold;'>7800萬</p>
-            <p style='color:#777;'>📍 西區 | 台中市西區五權西路</p>
-            <div style='line-height:1.6; color:#444; background:#f9f9f9; padding:15px; border-radius:10px;'>優質學區，高樓層視野佳</div>
-            <div style='margin-top:30px; display:flex; gap:10px;'>
-                <a href="tel:0938-615-351" style="flex:1; background:#e67e22; color:#fff; text-align:center; padding:15px; text-decoration:none; border-radius:50px; font-weight:bold;">📞 撥打電話</a>
-                <a href="https://line.me/ti/p/FDsMyAYDv" style="flex:1; background:#00b900; color:#fff; text-align:center; padding:15px; text-decoration:none; border-radius:50px; font-weight:bold;">💬 LINE 諮詢</a>
-            </div>
-        </div>
-        </body></html>
+<!doctype html><html lang='zh-TW'><head>
+    <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0">
+    <title>國美特區【宏台美術館】高樓層優質三房B1平車</title>
+    
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Noto+Sans+TC:wght@400;700;900&display=swap');
+    
+    :root { 
+        --navy: #0F172A; --gold: #B59461; --green: #10B981; 
+        --bg: #F8FAFC; --card-bg: #FFFFFF; 
+        --shadow-sm: 0 10px 30px rgba(15, 23, 42, 0.04);
+        --shadow-lg: 0 40px 100px rgba(15, 23, 42, 0.12);
+        --transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    body { font-family: 'Inter', 'Noto Sans TC', sans-serif; margin: 0; background: var(--bg); color: #1E293B; letter-spacing: -0.01em; -webkit-font-smoothing: antialiased; }
+    
+    .container { width: 100%; max-width: 1200px; margin: auto; background: #fff; min-height: 100vh; position: relative; padding-bottom: 220px; box-shadow: 0 0 120px rgba(0,0,0,0.03); }
+    
+    .header { background: var(--navy); color: #fff; padding: 28px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 15px 50px rgba(0,0,0,0.18); }
+    .logo { font-weight: 950; font-size: 26px; letter-spacing: 2px; color: #fff; text-decoration: none; text-transform: uppercase; }
+
+    #map { height: 480px; background: #E2E8F0; width: 100%; border-bottom: 12px solid #fff; }
+    
+    .search-box { 
+        background: #fff; padding: 45px; margin: -100px auto 0; border-radius: 45px; 
+        box-shadow: var(--shadow-lg); position: relative; z-index: 10;
+        width: 94%; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; box-sizing: border-box;
+    }
+    .search-item { display: flex; flex-direction: column; gap: 10px; }
+    .search-label { font-size: 11px; font-weight: 900; color: var(--navy); text-transform: uppercase; letter-spacing: 2px; opacity: 0.4; }
+    .search-select, .search-input { 
+        padding: 18px; border-radius: 20px; border: 1.5px solid #E2E8F0; font-size: 15px; 
+        background: #F8FAFC; outline: none; transition: var(--transition);
+    }
+    .search-select:focus, .search-input:focus { border-color: var(--gold); background: #fff; box-shadow: 0 0 0 6px rgba(181, 148, 97, 0.08); }
+    .search-btn { 
+        background: var(--navy); color: #fff; border: none; padding: 22px; border-radius: 22px; 
+        font-weight: 900; font-size: 16px; cursor: pointer; transition: 0.4s; grid-column: 1 / -1; letter-spacing: 2px;
+    }
+    .search-btn:hover { background: var(--gold); transform: translateY(-4px); box-shadow: 0 15px 35px rgba(181, 148, 97, 0.3); }
+
+    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px; padding: 60px 25px; }
+    @media (min-width: 768px) { .grid { grid-template-columns: repeat(3, 1fr); gap: 45px; padding: 90px 45px; } }
+    
+    .card { 
+        border-radius: 50px; overflow: hidden; background: #fff; border: 1.5px solid #F1F5F9; 
+        display: flex; flex-direction: column; height: 100%; transition: var(--transition); text-decoration: none; color: inherit;
+    }
+    .card:hover { transform: translateY(-18px); box-shadow: 0 60px 120px rgba(15, 23, 42, 0.12); border-color: var(--gold); }
+    .card img { width: 100%; height: 280px; object-fit: cover; transition: 0.7s ease; }
+    .card:hover img { transform: scale(1.08); }
+    .card-body { padding: 35px; flex-grow: 1; display: flex; flex-direction: column; }
+    .card-title { font-size: 20px; font-weight: 900; color: var(--navy); line-height: 1.5; margin: 0; }
+    .card-price { color: var(--gold); font-weight: 950; font-size: 28px; margin-top: 15px; letter-spacing: -1.5px; }
+    
+    .badge { display: inline-block; padding: 10px 20px; background: #F1F5F9; color: #64748B; border-radius: 16px; font-size: 12px; font-weight: 800; margin: 0 10px 12px 0; }
+    
+    .action-bar { 
+        position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 1200px; 
+        padding: 30px 35px 55px; display: flex; gap: 20px; background: rgba(255,255,255,0.92); backdrop-filter: blur(25px); 
+        border-top: 1px solid #F1F5F9; z-index: 10000; box-sizing: border-box; 
+    }
+    .btn { flex: 1; text-align: center; padding: 25px; border-radius: 25px; text-decoration: none; font-weight: 950; color: #fff; font-size: 18px; transition: 0.3s; }
+    .btn-call { background: var(--navy); } .btn-line { background: var(--green); }
+    .btn:hover { transform: scale(0.97); opacity: 0.9; }
+</style>
+
+    
+    </head><body><div class="container">
+                <div class="header"><a href="/taichung-houses/" class="logo">← SK-L 大台中房地產</a></div>
+                <div style="height:500px; overflow:hidden;"><img src="https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/h03.jpg" style="width:100%; height:100%; object-fit:cover;"></div>
+                <div style="padding:60px 50px 100px;">
+                    <div style="color:var(--gold); font-weight:900; font-size:14px; letter-spacing:4px; margin-bottom:20px; text-transform:uppercase;">Luxury Real Estate Analyst</div>
+                    <h1 style="font-size:48px; font-weight:950; color:var(--navy); margin-bottom:15px; letter-spacing:-2px;">國美特區【宏台美術館】高樓層優質三房B1平車</h1>
+                    <div style="font-size:60px; color:var(--gold); font-weight:950; margin-bottom:50px; letter-spacing:-3px;">2188萬</div>
+                    <div style="margin-bottom:45px;">
+                        <span class="badge">📍 西區精選</span>
+                        <span class="badge">📐 0坪寬闊空間</span>
+                    </div>
+                    <div style="line-height:2.5; font-size:20px; color:#475569; background:#F8FAFC; padding:50px; border-radius:50px; border:1px solid #F1F5F9; margin-bottom:70px;">
+                        <div style="font-weight:900; color:var(--navy); margin-bottom:25px; font-size:24px; border-left:6px solid var(--gold); padding-left:20px;">置產專家建議分析</div>
+                        1. 位於國立台灣美術館附近,享有豐富人文氣息與綠地優勢2. 鄰近美術園道與草悟道,被視為台中房市熱門區3. 大勇國小，向上國中知名學區4. 向上市場/第二市場/第五市場採買好方便5. 戶數單純,社區稀有釋出6. 審計新村文創聚落,勤美誠品休閒好去處
+                    </div>
+                    <div style="background:#fff; border-radius:50px; padding:50px; border:1.5px solid #F1F5F9; box-shadow:var(--shadow-lg);">
+                        <div style="display:flex; align-items:center; gap:30px; margin-bottom:20px;">
+                            <img src="https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/agent_photo.jpg" style="width:100px; height:100px; border-radius:50%; object-fit:cover; border:6px solid #F8FAFC;" onerror="this.src='https://placehold.co/150x150?text=SK-L'">
+                            <div>
+                                <div style="font-size:30px; font-weight:950; color:var(--navy);">林世塏</div>
+                                <div style="font-size:16px; color:#94a3b8; font-weight:800;">大台中房產置產顧問</div>
+                            </div>
+                        </div>
+                        
+<div style="margin-top: 35px; padding-top: 25px; border-top: 1.5px solid #edf2f7; font-size: 11px; color: #94a3b8; line-height: 2.4; font-weight: 500;">
+    📍 英柏國際地產有限公司<br>
+    中市地價二字第 1070029259 號<br>
+    經紀人：王一媖 (103) 中市經紀字第 00678 號
+</div>
+
+                        <a href="https://line.me/ti/p/FDsMyAYDv_" target="_blank" style="display:block; background:var(--green); color:#fff; text-decoration:none; text-align:center; padding:25px; border-radius:25px; font-weight:950; margin-top:45px; font-size:21px; box-shadow:0 15px 40px rgba(16,185,129,0.35);">💬 立即聯繫，獲取專業置產報告</a>
+                    </div>
+                </div>
+                <div class="action-bar"><a class="btn btn-call" href="tel:0938-615-351">📞 立即撥打</a><a class="btn btn-line" href="https://line.me/ti/p/FDsMyAYDv_" target="_blank">💬 LINE 諮詢</a></div>
+            </div></body></html>

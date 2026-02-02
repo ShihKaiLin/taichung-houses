@@ -1,34 +1,20 @@
-name: Cloud Sync Deploy
-
-on:
-  push:
-    branches: [ main ]
-  workflow_dispatch:
-
-permissions:
-  contents: write
-  pages: write
-  id-token: write
-
+name: SKL_Portal_Build
+on: [push, workflow_dispatch]
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.9'
-      - name: Install dependencies
-        run: pip install requests beautifulsoup4
-      - name: Build Site
-        env:
-          MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.9'}
+      - name: Install
+        run: pip install requests
+      - name: Run
+        env: {MAPS_API_KEY: "${{ secrets.MAPS_API_KEY }}"}
         run: python build_sheets.py
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          path: '.'
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./
+          publish_branch: gh-pages

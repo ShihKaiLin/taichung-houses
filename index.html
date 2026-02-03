@@ -1,33 +1,15 @@
-import os, csv, requests, html, shutil, re, json
-from pathlib import Path
-from datetime import datetime
-from bs4 import BeautifulSoup
-
-# ============================================================
-# 1. 核心品牌配置 (SK-L Agency Branding)
-# ============================================================
-SITE_TITLE = "SK-L 大台中地產戰略"
-PROJECT_NAME = "taichung-houses"
-BASE_URL = f"https://shihkailin.github.io/{PROJECT_NAME}"
-SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQShAl0-TbUU0MQdYVe53im2T6lXQgh_7g-bdL6HHpIBFtA2yfIAMbPw4J9RgZUkROb9AAiMhnRC0kH/pub?output=csv"
-MAP_KEY = os.getenv("MAPS_API_KEY", "AIzaSyDzgnI2Ucv622CRkWwo2GE5JRrs_Y4HQY0")
-
-AGENT_INFO = {
-    "name": "林世塏", 
-    "title": "大台中房產置產顧問",
-    "phone": "0938-615-351", 
-    "line": "https://line.me/ti/p/FDsMyAYDv_",
-    "photo": f"https://raw.githubusercontent.com/ShihKaiLin/{PROJECT_NAME}/main/images/agent_photo.jpg"
-}
-
-# ============================================================
-# 2. 旗艦級 CSS 視覺系統 (參考 TamsuiHome 質感)
-# ============================================================
-CSS = f"""
+<!DOCTYPE html>
+<html lang='zh-TW'>
+<head>
+    <meta charset='utf-8'>
+    <meta name='viewport' content='width=device-width,initial-scale=1'>
+    <title>SK-L 大台中地產戰略</title>
+    <meta name='description' content='SK-L 大台中地產戰略 - 專業房產置產顧問，為您提供台中精華區優質物件'>
+    
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap');
     
-    :root {{
+    :root {
         --primary-navy: #003D5C;
         --primary-green: #2EAD7D;
         --accent-gold: #D4AF37;
@@ -39,24 +21,24 @@ CSS = f"""
         --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
         --shadow-md: 0 4px 16px rgba(0,0,0,0.12);
         --shadow-lg: 0 8px 32px rgba(0,0,0,0.16);
-    }}
+    }
     
-    * {{
+    * {
         box-sizing: border-box;
         margin: 0;
         padding: 0;
-    }}
+    }
     
-    body {{
+    body {
         font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
         background: var(--bg-light);
         color: var(--text-dark);
         line-height: 1.7;
         overflow-x: hidden;
-    }}
+    }
     
     /* ========== 導航欄 ========== */
-    .navbar {{
+    .navbar {
         position: fixed;
         top: 0;
         width: 100%;
@@ -68,9 +50,9 @@ CSS = f"""
         align-items: center;
         box-shadow: var(--shadow-md);
         transition: all 0.3s ease;
-    }}
+    }
     
-    .logo {{
+    .logo {
         font-weight: 900;
         font-size: 22px;
         letter-spacing: 4px;
@@ -78,29 +60,29 @@ CSS = f"""
         color: var(--bg-white);
         text-transform: uppercase;
         transition: all 0.3s ease;
-    }}
+    }
     
-    .logo:hover {{
+    .logo:hover {
         color: var(--primary-green);
         transform: scale(1.05);
-    }}
+    }
     
-    .nav-links {{
+    .nav-links {
         display: flex;
         gap: 35px;
         list-style: none;
-    }}
+    }
     
-    .nav-links a {{
+    .nav-links a {
         color: var(--bg-white);
         text-decoration: none;
         font-weight: 500;
         font-size: 16px;
         transition: all 0.3s ease;
         position: relative;
-    }}
+    }
     
-    .nav-links a::after {{
+    .nav-links a::after {
         content: '';
         position: absolute;
         bottom: -5px;
@@ -109,14 +91,14 @@ CSS = f"""
         height: 2px;
         background: var(--primary-green);
         transition: width 0.3s ease;
-    }}
+    }
     
-    .nav-links a:hover::after {{
+    .nav-links a:hover::after {
         width: 100%;
-    }}
+    }
     
     /* ========== Hero 區域 ========== */
-    .hero {{
+    .hero {
         height: 75vh;
         min-height: 600px;
         background: linear-gradient(135deg, rgba(0,61,92,0.85) 0%, rgba(46,173,125,0.65) 100%), 
@@ -128,9 +110,9 @@ CSS = f"""
         color: var(--bg-white);
         position: relative;
         margin-top: 60px;
-    }}
+    }
     
-    .hero::before {{
+    .hero::before {
         content: '';
         position: absolute;
         top: 0;
@@ -138,53 +120,53 @@ CSS = f"""
         right: 0;
         bottom: 0;
         background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.3) 100%);
-    }}
+    }
     
-    .hero-content {{
+    .hero-content {
         position: relative;
         z-index: 10;
         max-width: 900px;
         padding: 0 30px;
-    }}
+    }
     
-    .hero-content h1 {{
+    .hero-content h1 {
         font-size: 64px;
         font-weight: 900;
         margin: 0 0 20px 0;
         letter-spacing: 6px;
         text-shadow: 2px 4px 12px rgba(0,0,0,0.3);
         animation: fadeInUp 1s ease;
-    }}
+    }
     
-    .hero-content p {{
+    .hero-content p {
         font-size: 22px;
         font-weight: 400;
         letter-spacing: 2px;
         opacity: 0.95;
         animation: fadeInUp 1.2s ease;
-    }}
+    }
     
-    @keyframes fadeInUp {{
-        from {{
+    @keyframes fadeInUp {
+        from {
             opacity: 0;
             transform: translateY(30px);
-        }}
-        to {{
+        }
+        to {
             opacity: 1;
             transform: translateY(0);
-        }}
-    }}
+        }
+    }
     
     /* ========== 地圖區域 ========== */
-    #map {{
+    #map {
         height: 500px;
         width: 100%;
         filter: grayscale(40%) contrast(95%);
         border-bottom: 1px solid var(--border-light);
-    }}
+    }
     
     /* ========== 搜尋區域 ========== */
-    .search-section {{
+    .search-section {
         width: 90%;
         max-width: 1200px;
         margin: -70px auto 80px;
@@ -198,24 +180,24 @@ CSS = f"""
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         gap: 25px;
         align-items: flex-end;
-    }}
+    }
     
-    .search-field {{
+    .search-field {
         display: flex;
         flex-direction: column;
         gap: 10px;
-    }}
+    }
     
-    .search-field label {{
+    .search-field label {
         font-weight: 600;
         font-size: 14px;
         color: var(--text-gray);
         text-transform: uppercase;
         letter-spacing: 1px;
-    }}
+    }
     
     .search-field select,
-    .search-field input {{
+    .search-field input {
         width: 100%;
         padding: 14px 18px;
         border: 2px solid var(--border-light);
@@ -224,16 +206,16 @@ CSS = f"""
         font-family: 'Noto Sans TC', sans-serif;
         transition: all 0.3s ease;
         background: var(--bg-white);
-    }}
+    }
     
     .search-field select:focus,
-    .search-field input:focus {{
+    .search-field input:focus {
         outline: none;
         border-color: var(--primary-green);
         box-shadow: 0 0 0 3px rgba(46,173,125,0.1);
-    }}
+    }
     
-    .btn-search {{
+    .btn-search {
         padding: 14px 40px;
         background: var(--primary-green);
         color: var(--bg-white);
@@ -245,41 +227,41 @@ CSS = f"""
         transition: all 0.3s ease;
         text-transform: uppercase;
         letter-spacing: 1px;
-    }}
+    }
     
-    .btn-search:hover {{
+    .btn-search:hover {
         background: #26976B;
         transform: translateY(-2px);
         box-shadow: var(--shadow-md);
-    }}
+    }
     
     /* ========== 物件網格 ========== */
-    .section-title {{
+    .section-title {
         text-align: center;
         font-size: 42px;
         font-weight: 900;
         color: var(--text-dark);
         margin: 80px 0 50px;
         letter-spacing: 2px;
-    }}
+    }
     
-    .grid {{
+    .grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
         gap: 40px;
         padding: 0 60px 100px;
         max-width: 1400px;
         margin: 0 auto;
-    }}
+    }
     
-    .card-anchor {{
+    .card-anchor {
         text-decoration: none;
         color: inherit;
         display: block;
         transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    }}
+    }
     
-    .card {{
+    .card {
         background: var(--bg-white);
         border-radius: 16px;
         overflow: hidden;
@@ -288,32 +270,32 @@ CSS = f"""
         height: 100%;
         display: flex;
         flex-direction: column;
-    }}
+    }
     
-    .card-anchor:hover .card {{
+    .card-anchor:hover .card {
         transform: translateY(-8px);
         box-shadow: var(--shadow-lg);
-    }}
+    }
     
-    .card-img-wrapper {{
+    .card-img-wrapper {
         position: relative;
         width: 100%;
         height: 280px;
         overflow: hidden;
-    }}
+    }
     
-    .card-img {{
+    .card-img {
         width: 100%;
         height: 100%;
         object-fit: cover;
         transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-    }}
+    }
     
-    .card-anchor:hover .card-img {{
+    .card-anchor:hover .card-img {
         transform: scale(1.08);
-    }}
+    }
     
-    .card-badge {{
+    .card-badge {
         position: absolute;
         top: 20px;
         left: 20px;
@@ -325,47 +307,47 @@ CSS = f"""
         font-size: 14px;
         letter-spacing: 1px;
         box-shadow: var(--shadow-sm);
-    }}
+    }
     
-    .card-body {{
+    .card-body {
         padding: 28px;
         flex: 1;
         display: flex;
         flex-direction: column;
         gap: 12px;
-    }}
+    }
     
-    .card-area {{
+    .card-area {
         color: var(--primary-navy);
         font-weight: 600;
         font-size: 14px;
         text-transform: uppercase;
         letter-spacing: 1.5px;
-    }}
+    }
     
-    .card-title {{
+    .card-title {
         font-size: 22px;
         font-weight: 700;
         color: var(--text-dark);
         line-height: 1.4;
         margin: 0;
-    }}
+    }
     
-    .card-price {{
+    .card-price {
         font-size: 32px;
         font-weight: 900;
         color: var(--primary-green);
         margin-top: auto;
-    }}
+    }
     
-    .card-price span {{
+    .card-price span {
         font-size: 18px;
         font-weight: 500;
         color: var(--text-gray);
-    }}
+    }
     
     /* ========== 關於區域 ========== */
-    .about-section {{
+    .about-section {
         background: var(--bg-white);
         padding: 120px 60px;
         display: flex;
@@ -375,42 +357,42 @@ CSS = f"""
         margin: 80px auto;
         border-radius: 20px;
         box-shadow: var(--shadow-sm);
-    }}
+    }
     
-    .about-img {{
+    .about-img {
         width: 450px;
         height: 600px;
         object-fit: cover;
         border-radius: 20px;
         box-shadow: 30px 30px 0 var(--primary-green);
         transition: all 0.4s ease;
-    }}
+    }
     
-    .about-img:hover {{
+    .about-img:hover {
         transform: translate(-5px, -5px);
         box-shadow: 35px 35px 0 var(--primary-green);
-    }}
+    }
     
-    .about-content {{
+    .about-content {
         flex: 1;
-    }}
+    }
     
-    .about-content h3 {{
+    .about-content h3 {
         font-size: 38px;
         font-weight: 900;
         color: var(--text-dark);
         margin-bottom: 15px;
         letter-spacing: 1px;
-    }}
+    }
     
-    .about-content p {{
+    .about-content p {
         font-size: 18px;
         line-height: 2;
         color: var(--text-gray);
-    }}
+    }
     
     /* ========== 聯絡欄 ========== */
-    .contact-bar {{
+    .contact-bar {
         position: fixed;
         bottom: 40px;
         left: 50%;
@@ -425,20 +407,20 @@ CSS = f"""
         z-index: 10000;
         box-shadow: var(--shadow-lg);
         animation: slideUp 0.6s ease;
-    }}
+    }
     
-    @keyframes slideUp {{
-        from {{
+    @keyframes slideUp {
+        from {
             opacity: 0;
             transform: translate(-50%, 100px);
-        }}
-        to {{
+        }
+        to {
             opacity: 1;
             transform: translate(-50%, 0);
-        }}
-    }}
+        }
+    }
     
-    .btn-contact {{
+    .btn-contact {
         flex: 1;
         text-align: center;
         padding: 18px;
@@ -452,39 +434,39 @@ CSS = f"""
         align-items: center;
         justify-content: center;
         gap: 8px;
-    }}
+    }
     
-    .btn-line {{
+    .btn-line {
         background: #06C755;
-    }}
+    }
     
-    .btn-line:hover {{
+    .btn-line:hover {
         background: #05B04C;
         transform: translateY(-3px);
         box-shadow: 0 8px 20px rgba(6,199,85,0.4);
-    }}
+    }
     
-    .btn-phone {{
+    .btn-phone {
         background: var(--primary-green);
-    }}
+    }
     
-    .btn-phone:hover {{
+    .btn-phone:hover {
         background: #26976B;
         transform: translateY(-3px);
         box-shadow: 0 8px 20px rgba(46,173,125,0.4);
-    }}
+    }
     
     /* ========== 詳細頁面 ========== */
-    .detail-hero {{
+    .detail-hero {
         height: 65vh;
         min-height: 500px;
         background-size: cover;
         background-position: center;
         position: relative;
         margin-top: 60px;
-    }}
+    }
     
-    .detail-hero::before {{
+    .detail-hero::before {
         content: '';
         position: absolute;
         top: 0;
@@ -492,36 +474,36 @@ CSS = f"""
         right: 0;
         bottom: 0;
         background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.6) 100%);
-    }}
+    }
     
-    .detail-content {{
+    .detail-content {
         padding: 80px 60px;
         max-width: 1000px;
         margin: 0 auto;
-    }}
+    }
     
-    .detail-content h1 {{
+    .detail-content h1 {
         font-size: 48px;
         font-weight: 900;
         color: var(--text-dark);
         margin-bottom: 30px;
         letter-spacing: 1px;
-    }}
+    }
     
-    .detail-price {{
+    .detail-price {
         font-size: 56px;
         font-weight: 900;
         color: var(--primary-green);
         margin-bottom: 40px;
-    }}
+    }
     
-    .detail-price span {{
+    .detail-price span {
         font-size: 28px;
         font-weight: 500;
         color: var(--text-gray);
-    }}
+    }
     
-    .detail-description {{
+    .detail-description {
         font-size: 20px;
         line-height: 2.2;
         color: var(--text-gray);
@@ -529,260 +511,164 @@ CSS = f"""
         padding: 50px;
         border-radius: 20px;
         box-shadow: var(--shadow-sm);
-    }}
+    }
     
     /* ========== 響應式設計 ========== */
-    @media (max-width: 1024px) {{
-        .grid {{
+    @media (max-width: 1024px) {
+        .grid {
             grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
             gap: 30px;
             padding: 0 40px 80px;
-        }}
+        }
         
-        .about-section {{
+        .about-section {
             flex-direction: column;
             padding: 80px 40px;
-        }}
+        }
         
-        .about-img {{
+        .about-img {
             width: 100%;
             max-width: 450px;
             height: 500px;
-        }}
-    }}
+        }
+    }
     
-    @media (max-width: 768px) {{
-        .navbar {{
+    @media (max-width: 768px) {
+        .navbar {
             padding: 15px 25px;
-        }}
+        }
         
-        .logo {{
+        .logo {
             font-size: 18px;
             letter-spacing: 2px;
-        }}
+        }
         
-        .nav-links {{
+        .nav-links {
             display: none;
-        }}
+        }
         
-        .hero {{
+        .hero {
             height: 60vh;
             min-height: 500px;
-        }}
+        }
         
-        .hero-content h1 {{
+        .hero-content h1 {
             font-size: 42px;
             letter-spacing: 3px;
-        }}
+        }
         
-        .hero-content p {{
+        .hero-content p {
             font-size: 18px;
-        }}
+        }
         
-        .search-section {{
+        .search-section {
             grid-template-columns: 1fr;
             padding: 35px 30px;
             margin: -50px 20px 60px;
-        }}
+        }
         
-        .grid {{
+        .grid {
             grid-template-columns: 1fr;
             padding: 0 20px 60px;
-        }}
+        }
         
-        .about-section {{
+        .about-section {
             padding: 60px 25px;
             gap: 40px;
-        }}
+        }
         
-        .about-img {{
+        .about-img {
             height: 400px;
             box-shadow: 20px 20px 0 var(--primary-green);
-        }}
+        }
         
-        .about-content h3 {{
+        .about-content h3 {
             font-size: 32px;
-        }}
+        }
         
-        .about-content p {{
+        .about-content p {
             font-size: 16px;
-        }}
+        }
         
-        .contact-bar {{
+        .contact-bar {
             width: 95%;
             bottom: 20px;
             padding: 15px;
             flex-direction: column;
             gap: 10px;
-        }}
+        }
         
-        .detail-content {{
+        .detail-content {
             padding: 60px 25px;
-        }}
+        }
         
-        .detail-content h1 {{
+        .detail-content h1 {
             font-size: 36px;
-        }}
+        }
         
-        .detail-price {{
+        .detail-price {
             font-size: 42px;
-        }}
+        }
         
-        .detail-description {{
+        .detail-description {
             font-size: 18px;
             padding: 35px 25px;
-        }}
-    }}
+        }
+    }
 </style>
-"""
 
-def esc(s): return html.escape(str(s or "").strip())
-
-class SKL_Agency:
-    def __init__(self):
-        self.points = []
-        self.items = []
-
-    def build_layout(self, title, body, is_home=False):
-        map_js = ""
-        if is_home:
-            data = json.dumps(self.points, ensure_ascii=False)
-            map_js = f"""
-            <script src="https://maps.googleapis.com/maps/api/js?key={MAP_KEY}&callback=initMap" async defer></script>
+    
+            <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDzgnI2Ucv622CRkWwo2GE5JRrs_Y4HQY0&callback=initMap" async defer></script>
             <script>
-                function initMap() {{
-                    const map = new google.maps.Map(document.getElementById('map'), {{ 
-                        center: {{lat:24.162, lng:120.647}}, 
+                function initMap() {
+                    const map = new google.maps.Map(document.getElementById('map'), { 
+                        center: {lat:24.162, lng:120.647}, 
                         zoom:13, 
                         disableDefaultUI:true, 
-                        styles:[{{"featureType":"all","stylers":[{{"saturation":-40}},{{"lightness":10}}]}}] 
-                    }});
+                        styles:[{"featureType":"all","stylers":[{"saturation":-40},{"lightness":10}]}] 
+                    });
                     const iw = new google.maps.InfoWindow();
-                    const pts = {data};
-                    pts.forEach(p => {{
-                        const m = new google.maps.Marker({{ 
-                            position:{{lat:parseFloat(p.lat), lng:parseFloat(p.lng)}}, 
+                    const pts = [];
+                    pts.forEach(p => {
+                        const m = new google.maps.Marker({ 
+                            position:{lat:parseFloat(p.lat), lng:parseFloat(p.lng)}, 
                             map,
-                            icon: {{
+                            icon: {
                                 path: google.maps.SymbolPath.CIRCLE,
                                 scale: 10,
                                 fillColor: '#2EAD7D',
                                 fillOpacity: 1,
                                 strokeColor: '#FFFFFF',
                                 strokeWeight: 3
-                            }}
-                        }});
-                        m.addListener('click', () => {{ 
+                            }
+                        });
+                        m.addListener('click', () => { 
                             iw.setContent(`<div style="padding:15px;width:200px;font-family:'Noto Sans TC',sans-serif;">
-                                <img src="${{p.img}}" style="width:100%;border-radius:8px;margin-bottom:10px;">
-                                <h4 style="margin:8px 0;font-size:16px;color:#1A1A1A;">${{p.name}}</h4>
-                                <div style="font-size:20px;font-weight:700;color:#2EAD7D;margin:8px 0;">${{p.price}}萬</div>
-                                <a href="${{p.url}}" style="display:inline-block;margin-top:10px;padding:8px 16px;background:#2EAD7D;color:#fff;text-decoration:none;border-radius:6px;font-size:14px;font-weight:600;">查看詳情</a>
+                                <img src="${p.img}" style="width:100%;border-radius:8px;margin-bottom:10px;">
+                                <h4 style="margin:8px 0;font-size:16px;color:#1A1A1A;">${p.name}</h4>
+                                <div style="font-size:20px;font-weight:700;color:#2EAD7D;margin:8px 0;">${p.price}萬</div>
+                                <a href="${p.url}" style="display:inline-block;margin-top:10px;padding:8px 16px;background:#2EAD7D;color:#fff;text-decoration:none;border-radius:6px;font-size:14px;font-weight:600;">查看詳情</a>
                             </div>`); 
                             iw.open(map, m); 
-                        }});
-                    }});
-                }}
-            </script>"""
-        return f"""<!DOCTYPE html>
-<html lang='zh-TW'>
-<head>
-    <meta charset='utf-8'>
-    <meta name='viewport' content='width=device-width,initial-scale=1'>
-    <title>{esc(title)}</title>
-    <meta name='description' content='SK-L 大台中地產戰略 - 專業房產置產顧問，為您提供台中精華區優質物件'>
-    {CSS}
-    {map_js}
+                        });
+                    });
+                }
+            </script>
 </head>
-<body>{body}</body>
-</html>"""
-
-    def run(self):
-        for f in ["area", "life"]:
-            if Path(f).exists(): shutil.rmtree(f)
-            Path(f).mkdir(exist_ok=True)
-        
-        res = requests.get(SHEET_URL)
-        res.encoding = "utf-8-sig"
-        rows = list(csv.DictReader(res.text.splitlines()))
-        
-        for i, r in enumerate(rows):
-            name = r.get("案名", "").strip()
-            if not name or r.get("狀態", "").upper() == "OFF": 
-                continue
-            
-            img = r.get("圖片網址", "").split('|')[0]
-            if not img.startswith("http"): 
-                img = f"https://raw.githubusercontent.com/ShihKaiLin/{PROJECT_NAME}/main/images/{img.lstrip('/')}"
-            
-            slug = f"p{i}"
-            Path(slug).mkdir(exist_ok=True)
-            url = f"/{PROJECT_NAME}/{slug}/"
-            
-            if r.get("lat") and r.get("lng"): 
-                self.points.append({
-                    "name": name, 
-                    "price": r.get("價格"), 
-                    "img": img, 
-                    "url": url, 
-                    "lat": r["lat"], 
-                    "lng": r["lng"]
-                })
-            
-            detail = f"""
-            <nav class="navbar">
-                <a href="/{PROJECT_NAME}/" class="logo">SK-L AGENCY</a>
-            </nav>
-            <div class="detail-hero" style="background-image:url('{img}');"></div>
-            <div class="detail-content">
-                <h1>{esc(name)}</h1>
-                <div class="detail-price">{esc(r.get('價格'))} <span>萬</span></div>
-                <div class="detail-description">{esc(r.get('描述',''))}</div>
-            </div>
-            <div class="contact-bar">
-                <a class="btn-contact btn-line" href="{AGENT_INFO['line']}">💬 LINE 諮詢</a>
-                <a class="btn-contact btn-phone" href="tel:{AGENT_INFO['phone']}">📞 電話聯絡</a>
-            </div>
-            """
-            Path(f"{slug}/index.html").write_text(self.build_layout(name, detail), encoding="utf-8")
-            self.items.append(r)
-        
-        opts = "".join([f"<option value='{a}'>{a}</option>" for a in sorted(set(x.get('區域') for x in self.items if x.get('區域')))])
-        
-        cards = ""
-        for x in self.items[::-1]:
-            idx = rows.index(x)
-            img_url = self.points[self.items.index(x)]['img'] if self.items.index(x) < len(self.points) else ''
-            cards += f"""
-            <a href='/{PROJECT_NAME}/p{idx}/' class='card-anchor' data-area='{x.get('區域')}'>
-                <div class='card'>
-                    <div class='card-img-wrapper'>
-                        <img src='{img_url}' class='card-img' alt='{esc(x.get('案名'))}'>
-                        <div class='card-badge'>精選物件</div>
-                    </div>
-                    <div class='card-body'>
-                        <div class='card-area'>{esc(x.get('區域'))}</div>
-                        <h3 class='card-title'>{esc(x.get('案名'))}</h3>
-                        <div class='card-price'>{esc(x.get('價格'))} <span>萬</span></div>
-                    </div>
-                </div>
-            </a>
-            """
-        
-        home = f"""
+<body>
         <nav class="navbar">
             <a href="#" class="logo">SK-L REAL ESTATE</a>
             <ul class="nav-links">
                 <li><a href="#properties">精選物件</a></li>
                 <li><a href="#about">關於我們</a></li>
-                <li><a href="{AGENT_INFO['line']}">聯絡我們</a></li>
+                <li><a href="https://line.me/ti/p/FDsMyAYDv_">聯絡我們</a></li>
             </ul>
         </nav>
         
         <section class="hero">
             <div class="hero-content">
                 <h1>大台中置產專家</h1>
-                <p>{AGENT_INFO['name']} · 深耕台中精華區 · 專業誠信服務</p>
+                <p>林世塏 · 深耕台中精華區 · 專業誠信服務</p>
             </div>
         </section>
         
@@ -793,7 +679,7 @@ class SKL_Agency:
                 <label>行政區域</label>
                 <select id="s-area">
                     <option value="all">台中全區</option>
-                    {opts}
+                    <option value='北屯區'>北屯區</option><option value='南區'>南區</option><option value='南屯區'>南屯區</option><option value='大里區'>大里區</option><option value='沙鹿區'>沙鹿區</option><option value='西區'>西區</option><option value='西屯區'>西屯區</option><option value='豐原區'>豐原區</option>
                 </select>
             </div>
             <div class="search-field">
@@ -811,39 +697,203 @@ class SKL_Agency:
         
         <h2 class="section-title" id="properties">精選物件</h2>
         <div class="grid" id="property-grid">
-            {cards}
+            
+            <a href='/taichung-houses/p11/' class='card-anchor' data-area='大里區'>
+                <div class='card'>
+                    <div class='card-img-wrapper'>
+                        <img src='' class='card-img' alt='新時代別墅 M012'>
+                        <div class='card-badge'>精選物件</div>
+                    </div>
+                    <div class='card-body'>
+                        <div class='card-area'>大里區</div>
+                        <h3 class='card-title'>新時代別墅 M012</h3>
+                        <div class='card-price'>2,990 萬 <span>萬</span></div>
+                    </div>
+                </div>
+            </a>
+            
+            <a href='/taichung-houses/p10/' class='card-anchor' data-area='南屯區'>
+                <div class='card'>
+                    <div class='card-img-wrapper'>
+                        <img src='' class='card-img' alt='五期美寓 L011'>
+                        <div class='card-badge'>精選物件</div>
+                    </div>
+                    <div class='card-body'>
+                        <div class='card-area'>南屯區</div>
+                        <h3 class='card-title'>五期美寓 L011</h3>
+                        <div class='card-price'>1,350 萬 <span>萬</span></div>
+                    </div>
+                </div>
+            </a>
+            
+            <a href='/taichung-houses/p9/' class='card-anchor' data-area='西屯區'>
+                <div class='card'>
+                    <div class='card-img-wrapper'>
+                        <img src='' class='card-img' alt='逢甲商辦 K010'>
+                        <div class='card-badge'>精選物件</div>
+                    </div>
+                    <div class='card-body'>
+                        <div class='card-area'>西屯區</div>
+                        <h3 class='card-title'>逢甲商辦 K010</h3>
+                        <div class='card-price'>3,800 萬 <span>萬</span></div>
+                    </div>
+                </div>
+            </a>
+            
+            <a href='/taichung-houses/p8/' class='card-anchor' data-area='沙鹿區'>
+                <div class='card'>
+                    <div class='card-img-wrapper'>
+                        <img src='' class='card-img' alt='靜宜學區套房 J009'>
+                        <div class='card-badge'>精選物件</div>
+                    </div>
+                    <div class='card-body'>
+                        <div class='card-area'>沙鹿區</div>
+                        <h3 class='card-title'>靜宜學區套房 J009</h3>
+                        <div class='card-price'>450 萬 <span>萬</span></div>
+                    </div>
+                </div>
+            </a>
+            
+            <a href='/taichung-houses/p7/' class='card-anchor' data-area='北屯區'>
+                <div class='card'>
+                    <div class='card-img-wrapper'>
+                        <img src='' class='card-img' alt='水岸華廈 I008'>
+                        <div class='card-badge'>精選物件</div>
+                    </div>
+                    <div class='card-body'>
+                        <div class='card-area'>北屯區</div>
+                        <h3 class='card-title'>水岸華廈 I008</h3>
+                        <div class='card-price'>2,150 萬 <span>萬</span></div>
+                    </div>
+                </div>
+            </a>
+            
+            <a href='/taichung-houses/p6/' class='card-anchor' data-area='大里區'>
+                <div class='card'>
+                    <div class='card-img-wrapper'>
+                        <img src='' class='card-img' alt='首購公寓 H007'>
+                        <div class='card-badge'>精選物件</div>
+                    </div>
+                    <div class='card-body'>
+                        <div class='card-area'>大里區</div>
+                        <h3 class='card-title'>首購公寓 H007</h3>
+                        <div class='card-price'>680 萬 <span>萬</span></div>
+                    </div>
+                </div>
+            </a>
+            
+            <a href='/taichung-houses/p5/' class='card-anchor' data-area='豐原區'>
+                <div class='card'>
+                    <div class='card-img-wrapper'>
+                        <img src='' class='card-img' alt='田園透天 G006'>
+                        <div class='card-badge'>精選物件</div>
+                    </div>
+                    <div class='card-body'>
+                        <div class='card-area'>豐原區</div>
+                        <h3 class='card-title'>田園透天 G006</h3>
+                        <div class='card-price'>1,650 萬 <span>萬</span></div>
+                    </div>
+                </div>
+            </a>
+            
+            <a href='/taichung-houses/p4/' class='card-anchor' data-area='南屯區'>
+                <div class='card'>
+                    <div class='card-img-wrapper'>
+                        <img src='' class='card-img' alt='文心森林公園【大有可為】3+1房附休旅車位捷運宅'>
+                        <div class='card-badge'>精選物件</div>
+                    </div>
+                    <div class='card-body'>
+                        <div class='card-area'>南屯區</div>
+                        <h3 class='card-title'>文心森林公園【大有可為】3+1房附休旅車位捷運宅</h3>
+                        <div class='card-price'>1698萬 <span>萬</span></div>
+                    </div>
+                </div>
+            </a>
+            
+            <a href='/taichung-houses/p3/' class='card-anchor' data-area='南區'>
+                <div class='card'>
+                    <div class='card-img-wrapper'>
+                        <img src='' class='card-img' alt='中山醫大慶捷運站之悠森學首購好宅'>
+                        <div class='card-badge'>精選物件</div>
+                    </div>
+                    <div class='card-body'>
+                        <div class='card-area'>南區</div>
+                        <h3 class='card-title'>中山醫大慶捷運站之悠森學首購好宅</h3>
+                        <div class='card-price'>1766萬 <span>萬</span></div>
+                    </div>
+                </div>
+            </a>
+            
+            <a href='/taichung-houses/p2/' class='card-anchor' data-area='西區'>
+                <div class='card'>
+                    <div class='card-img-wrapper'>
+                        <img src='' class='card-img' alt='國美特區【宏台美術館】高樓層優質三房B1平車'>
+                        <div class='card-badge'>精選物件</div>
+                    </div>
+                    <div class='card-body'>
+                        <div class='card-area'>西區</div>
+                        <h3 class='card-title'>國美特區【宏台美術館】高樓層優質三房B1平車</h3>
+                        <div class='card-price'>2188萬 <span>萬</span></div>
+                    </div>
+                </div>
+            </a>
+            
+            <a href='/taichung-houses/p1/' class='card-anchor' data-area='沙鹿區'>
+                <div class='card'>
+                    <div class='card-img-wrapper'>
+                        <img src='' class='card-img' alt='專任沙鹿北勢國小過洋居全新電梯雙車別墅C10'>
+                        <div class='card-badge'>精選物件</div>
+                    </div>
+                    <div class='card-body'>
+                        <div class='card-area'>沙鹿區</div>
+                        <h3 class='card-title'>專任沙鹿北勢國小過洋居全新電梯雙車別墅C10</h3>
+                        <div class='card-price'>2,758 萬 <span>萬</span></div>
+                    </div>
+                </div>
+            </a>
+            
+            <a href='/taichung-houses/p0/' class='card-anchor' data-area='沙鹿區'>
+                <div class='card'>
+                    <div class='card-img-wrapper'>
+                        <img src='' class='card-img' alt='專任沙鹿北勢國小過洋居全新電梯雙車別墅C1'>
+                        <div class='card-badge'>精選物件</div>
+                    </div>
+                    <div class='card-body'>
+                        <div class='card-area'>沙鹿區</div>
+                        <h3 class='card-title'>專任沙鹿北勢國小過洋居全新電梯雙車別墅C1</h3>
+                        <div class='card-price'>2,798萬 <span>萬</span></div>
+                    </div>
+                </div>
+            </a>
+            
         </div>
         
         <section class="about-section" id="about">
-            <img src="{AGENT_INFO['photo']}" class="about-img" alt="{AGENT_INFO['name']}">
+            <img src="https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/agent_photo.jpg" class="about-img" alt="林世塏">
             <div class="about-content">
-                <h3>{AGENT_INFO['name']}</h3>
-                <p>{AGENT_INFO['title']}</p>
+                <h3>林世塏</h3>
+                <p>大台中房產置產顧問</p>
                 <p style="margin-top:25px;">我們致力於為每一位客戶提供精準的市場分析與專業的置產建議。深耕大台中地區多年，熟悉各區域特色與發展潛力，我們不只是仲介，更是您最值得信賴的置產顧問。無論您是首購族、換屋族或投資客，我們都能為您量身打造最適合的購屋方案。</p>
             </div>
         </section>
         
         <div class="contact-bar">
-            <a class="btn-contact btn-line" href="{AGENT_INFO['line']}">💬 LINE 諮詢</a>
-            <a class="btn-contact btn-phone" href="tel:{AGENT_INFO['phone']}">📞 {AGENT_INFO['phone']}</a>
+            <a class="btn-contact btn-line" href="https://line.me/ti/p/FDsMyAYDv_">💬 LINE 諮詢</a>
+            <a class="btn-contact btn-phone" href="tel:0938-615-351">📞 0938-615-351</a>
         </div>
         
         <script>
-            function filterProperties() {{
+            function filterProperties() {
                 const area = document.getElementById('s-area').value;
                 const cards = document.querySelectorAll('.card-anchor');
-                cards.forEach(card => {{
-                    if (area === 'all' || card.dataset.area === area) {{
+                cards.forEach(card => {
+                    if (area === 'all' || card.dataset.area === area) {
                         card.style.display = 'block';
-                    }} else {{
+                    } else {
                         card.style.display = 'none';
-                    }}
-                }});
-            }}
+                    }
+                });
+            }
         </script>
-        """
-        
-        Path("index.html").write_text(self.build_layout(SITE_TITLE, home, True), encoding="utf-8")
-
-if __name__ == "__main__":
-    SKL_Agency().run()
+        </body>
+</html>

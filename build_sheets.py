@@ -21,7 +21,7 @@ AGENT_INFO = {
 }
 
 # ============================================================
-# 2. 旗艦級 CSS 視覺系統 (參考 TamsuiHome 質感)
+# 2. 升級版 CSS 視覺系統（全寬度地圖 + 頂部篩選列）
 # ============================================================
 CSS = f"""
 <style>
@@ -29,7 +29,8 @@ CSS = f"""
     
     :root {{
         --primary-navy: #003D5C;
-        --primary-green: #2EAD7D;
+        --primary-green: #4CAF50;
+        --primary-blue: #2196F3;
         --accent-gold: #D4AF37;
         --bg-light: #F5F7FA;
         --bg-white: #FFFFFF;
@@ -119,7 +120,7 @@ CSS = f"""
     .hero {{
         height: 75vh;
         min-height: 600px;
-        background: linear-gradient(135deg, rgba(0,61,92,0.85) 0%, rgba(46,173,125,0.65) 100%), 
+        background: linear-gradient(135deg, rgba(0,61,92,0.85) 0%, rgba(76,175,80,0.65) 100%), 
                     url('https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1920&q=80') center/cover;
         display: flex;
         align-items: center;
@@ -175,82 +176,88 @@ CSS = f"""
         }}
     }}
     
-    /* ========== 地圖區域 ========== */
-    #map {{
-        height: 500px;
+    /* ========== 地圖容器（全寬度） ========== */
+    .map-container {{
         width: 100%;
-        filter: grayscale(40%) contrast(95%);
-        border-bottom: 1px solid var(--border-light);
-    }}
-    
-    /* ========== 搜尋區域 ========== */
-    .search-section {{
-        width: 90%;
-        max-width: 1200px;
-        margin: -70px auto 80px;
-        background: var(--bg-white);
-        padding: 45px 50px;
-        border-radius: 20px;
-        box-shadow: var(--shadow-lg);
         position: relative;
-        z-index: 1000;
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 25px;
-        align-items: flex-end;
+        background: var(--bg-white);
+        box-shadow: var(--shadow-sm);
     }}
     
-    .search-field {{
+    /* ========== 頂部橫向篩選列 ========== */
+    .filter-bar {{
+        width: 100%;
+        background: var(--bg-white);
+        padding: 20px 40px;
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        flex-wrap: wrap;
+        border-bottom: 2px solid var(--border-light);
+        box-shadow: var(--shadow-sm);
+    }}
+    
+    .filter-group {{
         display: flex;
         flex-direction: column;
-        gap: 10px;
+        gap: 5px;
+        min-width: 150px;
+        flex: 1;
     }}
     
-    .search-field label {{
+    .filter-group label {{
         font-weight: 600;
-        font-size: 14px;
+        font-size: 13px;
         color: var(--text-gray);
         text-transform: uppercase;
-        letter-spacing: 1px;
+        letter-spacing: 0.5px;
     }}
     
-    .search-field select,
-    .search-field input {{
+    .filter-group select {{
         width: 100%;
-        padding: 14px 18px;
+        padding: 12px 15px;
         border: 2px solid var(--border-light);
-        border-radius: 10px;
-        font-size: 16px;
+        border-radius: 8px;
+        font-size: 15px;
         font-family: 'Noto Sans TC', sans-serif;
         transition: all 0.3s ease;
         background: var(--bg-white);
+        cursor: pointer;
     }}
     
-    .search-field select:focus,
-    .search-field input:focus {{
+    .filter-group select:focus {{
         outline: none;
         border-color: var(--primary-green);
-        box-shadow: 0 0 0 3px rgba(46,173,125,0.1);
+        box-shadow: 0 0 0 3px rgba(76,175,80,0.1);
     }}
     
-    .btn-search {{
-        padding: 14px 40px;
+    .filter-btn {{
+        padding: 12px 35px;
         background: var(--primary-green);
         color: var(--bg-white);
         border: none;
-        border-radius: 10px;
-        font-size: 16px;
+        border-radius: 8px;
+        font-size: 15px;
         font-weight: 700;
         cursor: pointer;
         transition: all 0.3s ease;
         text-transform: uppercase;
         letter-spacing: 1px;
+        margin-top: auto;
+        box-shadow: 0 2px 8px rgba(76,175,80,0.3);
     }}
     
-    .btn-search:hover {{
-        background: #26976B;
+    .filter-btn:hover {{
+        background: #45a049;
         transform: translateY(-2px);
-        box-shadow: var(--shadow-md);
+        box-shadow: 0 4px 12px rgba(76,175,80,0.4);
+    }}
+    
+    /* ========== 地圖區域（全寬度） ========== */
+    #map {{
+        height: 600px;
+        width: 100%;
+        filter: grayscale(20%) contrast(100%);
     }}
     
     /* ========== 物件網格 ========== */
@@ -469,9 +476,9 @@ CSS = f"""
     }}
     
     .btn-phone:hover {{
-        background: #26976B;
+        background: #45a049;
         transform: translateY(-3px);
-        box-shadow: 0 8px 20px rgba(46,173,125,0.4);
+        box-shadow: 0 8px 20px rgba(76,175,80,0.4);
     }}
     
     /* ========== 詳細頁面 ========== */
@@ -549,6 +556,10 @@ CSS = f"""
             max-width: 450px;
             height: 500px;
         }}
+        
+        .filter-bar {{
+            padding: 15px 20px;
+        }}
     }}
     
     @media (max-width: 768px) {{
@@ -579,10 +590,22 @@ CSS = f"""
             font-size: 18px;
         }}
         
-        .search-section {{
-            grid-template-columns: 1fr;
-            padding: 35px 30px;
-            margin: -50px 20px 60px;
+        .filter-bar {{
+            flex-direction: column;
+            gap: 10px;
+        }}
+        
+        .filter-group {{
+            width: 100%;
+            min-width: auto;
+        }}
+        
+        .filter-btn {{
+            width: 100%;
+        }}
+        
+        #map {{
+            height: 400px;
         }}
         
         .grid {{
@@ -636,54 +659,123 @@ CSS = f"""
 </style>
 """
 
-def esc(s): return html.escape(str(s or "").strip())
+def esc(s): 
+    """HTML 轉義函數"""
+    return html.escape(str(s or "").strip())
 
 class SKL_Agency:
     def __init__(self):
         self.points = []
         self.items = []
+        self.areas = set()
+        self.types = set()
 
     def build_layout(self, title, body, is_home=False):
+        """建立頁面佈局"""
         map_js = ""
         if is_home:
             data = json.dumps(self.points, ensure_ascii=False)
             map_js = f"""
             <script src="https://maps.googleapis.com/maps/api/js?key={MAP_KEY}&callback=initMap" async defer></script>
             <script>
+                let map;
+                let markers = [];
+                let infoWindow;
+                
                 function initMap() {{
-                    const map = new google.maps.Map(document.getElementById('map'), {{ 
+                    map = new google.maps.Map(document.getElementById('map'), {{ 
                         center: {{lat:24.162, lng:120.647}}, 
-                        zoom:13, 
-                        disableDefaultUI:true, 
-                        styles:[{{"featureType":"all","stylers":[{{"saturation":-40}},{{"lightness":10}}]}}] 
+                        zoom:12, 
+                        disableDefaultUI: false,
+                        zoomControl: true,
+                        mapTypeControl: false,
+                        streetViewControl: false,
+                        fullscreenControl: true,
+                        styles: [
+                            {{
+                                "featureType": "all",
+                                "elementType": "geometry",
+                                "stylers": [{{"saturation": -20}}]
+                            }},
+                            {{
+                                "featureType": "water",
+                                "elementType": "geometry.fill",
+                                "stylers": [{{"color": "#c8d7d4}}]
+                            }}
+                        ]
                     }});
-                    const iw = new google.maps.InfoWindow();
+                    
+                    infoWindow = new google.maps.InfoWindow();
                     const pts = {data};
-                    pts.forEach(p => {{
-                        const m = new google.maps.Marker({{ 
-                            position:{{lat:parseFloat(p.lat), lng:parseFloat(p.lng)}}, 
-                            map,
+                    
+                    pts.forEach((p, index) => {{
+                        // 創建自定義藍色圓形標記，帶房屋圖示
+                        const marker = new google.maps.Marker({{ 
+                            position: {{lat: parseFloat(p.lat), lng: parseFloat(p.lng)}}, 
+                            map: map,
                             icon: {{
                                 path: google.maps.SymbolPath.CIRCLE,
-                                scale: 10,
-                                fillColor: '#2EAD7D',
+                                scale: 12,
+                                fillColor: '#2196F3',
                                 fillOpacity: 1,
                                 strokeColor: '#FFFFFF',
                                 strokeWeight: 3
-                            }}
+                            }},
+                            title: p.name,
+                            animation: google.maps.Animation.DROP
                         }});
-                        m.addListener('click', () => {{ 
-                            iw.setContent(`<div style="padding:15px;width:200px;font-family:'Noto Sans TC',sans-serif;">
-                                <img src="${{p.img}}" style="width:100%;border-radius:8px;margin-bottom:10px;">
-                                <h4 style="margin:8px 0;font-size:16px;color:#1A1A1A;">${{p.name}}</h4>
-                                <div style="font-size:20px;font-weight:700;color:#2EAD7D;margin:8px 0;">${{p.price}}萬</div>
-                                <a href="${{p.url}}" style="display:inline-block;margin-top:10px;padding:8px 16px;background:#2EAD7D;color:#fff;text-decoration:none;border-radius:6px;font-size:14px;font-weight:600;">查看詳情</a>
-                            </div>`); 
-                            iw.open(map, m); 
+                        
+                        marker.addListener('click', () => {{ 
+                            infoWindow.setContent(`
+                                <div style="padding:15px;width:220px;font-family:'Noto Sans TC',sans-serif;">
+                                    <img src="${{p.img}}" style="width:100%;border-radius:8px;margin-bottom:10px;" alt="${{p.name}}">
+                                    <h4 style="margin:8px 0;font-size:16px;color:#1A1A1A;font-weight:700;">${{p.name}}</h4>
+                                    <div style="font-size:22px;font-weight:900;color:#4CAF50;margin:8px 0;">${{p.price}}萬</div>
+                                    <a href="${{p.url}}" style="display:inline-block;margin-top:10px;padding:10px 20px;background:#4CAF50;color:#fff;text-decoration:none;border-radius:8px;font-size:14px;font-weight:700;">查看詳情</a>
+                                </div>
+                            `); 
+                            infoWindow.open(map, marker); 
                         }});
+                        
+                        markers.push(marker);
                     }});
                 }}
-            </script>"""
+                
+                // 篩選功能
+                function filterProperties() {{
+                    const area = document.getElementById('filter-area').value;
+                    const type = document.getElementById('filter-type').value;
+                    const rooms = document.getElementById('filter-rooms').value;
+                    const price = document.getElementById('filter-price').value;
+                    
+                    const cards = document.querySelectorAll('.card-anchor');
+                    cards.forEach(card => {{
+                        const cardArea = card.dataset.area || '';
+                        const cardType = card.dataset.type || '';
+                        const cardRooms = card.dataset.rooms || '';
+                        const cardPrice = parseFloat(card.dataset.price) || 0;
+                        
+                        let show = true;
+                        
+                        if (area !== 'all' && cardArea !== area) show = false;
+                        if (type !== 'all' && cardType !== type) show = false;
+                        if (rooms !== 'all' && cardRooms !== rooms) show = false;
+                        
+                        if (price !== 'all') {{
+                            const [min, max] = price.split('-').map(p => parseFloat(p) || Infinity);
+                            if (max) {{
+                                if (cardPrice < min || cardPrice > max) show = false;
+                            }} else {{
+                                if (cardPrice < min) show = false;
+                            }}
+                        }}
+                        
+                        card.style.display = show ? 'block' : 'none';
+                    }});
+                }}
+            </script>
+            """
+        
         return f"""<!DOCTYPE html>
 <html lang='zh-TW'>
 <head>
@@ -698,37 +790,54 @@ class SKL_Agency:
 </html>"""
 
     def run(self):
+        """主執行函數"""
+        # 清理舊目錄
         for f in ["area", "life"]:
-            if Path(f).exists(): shutil.rmtree(f)
+            if Path(f).exists(): 
+                shutil.rmtree(f)
             Path(f).mkdir(exist_ok=True)
         
+        # 獲取資料
         res = requests.get(SHEET_URL)
         res.encoding = "utf-8-sig"
         rows = list(csv.DictReader(res.text.splitlines()))
         
+        # 處理每個物件
         for i, r in enumerate(rows):
             name = r.get("案名", "").strip()
             if not name or r.get("狀態", "").upper() == "OFF": 
                 continue
             
+            # 處理圖片
             img = r.get("圖片網址", "").split('|')[0]
             if not img.startswith("http"): 
                 img = f"https://raw.githubusercontent.com/ShihKaiLin/{PROJECT_NAME}/main/images/{img.lstrip('/')}"
             
+            # 建立物件目錄
             slug = f"p{i}"
             Path(slug).mkdir(exist_ok=True)
             url = f"/{PROJECT_NAME}/{slug}/"
             
+            # 收集篩選選項
+            area = r.get("區域", "").strip()
+            prop_type = r.get("類型", "").strip()
+            if area:
+                self.areas.add(area)
+            if prop_type:
+                self.types.add(prop_type)
+            
+            # 加入地圖標記
             if r.get("lat") and r.get("lng"): 
                 self.points.append({
                     "name": name, 
-                    "price": r.get("價格"), 
+                    "price": r.get("價格", ""), 
                     "img": img, 
                     "url": url, 
                     "lat": r["lat"], 
                     "lng": r["lng"]
                 })
             
+            # 建立詳細頁面
             detail = f"""
             <nav class="navbar">
                 <a href="/{PROJECT_NAME}/" class="logo">SK-L AGENCY</a>
@@ -736,8 +845,8 @@ class SKL_Agency:
             <div class="detail-hero" style="background-image:url('{img}');"></div>
             <div class="detail-content">
                 <h1>{esc(name)}</h1>
-                <div class="detail-price">{esc(r.get('價格'))} <span>萬</span></div>
-                <div class="detail-description">{esc(r.get('描述',''))}</div>
+                <div class="detail-price">{esc(r.get('價格', ''))} <span>萬</span></div>
+                <div class="detail-description">{esc(r.get('描述', ''))}</div>
             </div>
             <div class="contact-bar">
                 <a class="btn-contact btn-line" href="{AGENT_INFO['line']}">💬 LINE 諮詢</a>
@@ -747,32 +856,43 @@ class SKL_Agency:
             Path(f"{slug}/index.html").write_text(self.build_layout(name, detail), encoding="utf-8")
             self.items.append(r)
         
-        opts = "".join([f"<option value='{a}'>{a}</option>" for a in sorted(set(x.get('區域') for x in self.items if x.get('區域')))])
+        # 建立篩選選項
+        area_opts = "".join([f"<option value='{a}'>{a}</option>" for a in sorted(self.areas)])
+        type_opts = "".join([f"<option value='{t}'>{t}</option>" for t in sorted(self.types)])
         
+        # 建立物件卡片
         cards = ""
         for x in self.items[::-1]:
             idx = rows.index(x)
             img_url = self.points[self.items.index(x)]['img'] if self.items.index(x) < len(self.points) else ''
+            price = x.get('價格', '0')
+            rooms = x.get('房數', '')
             cards += f"""
-            <a href='/{PROJECT_NAME}/p{idx}/' class='card-anchor' data-area='{x.get('區域')}'>
+            <a href='/{PROJECT_NAME}/p{idx}/' class='card-anchor' 
+               data-area='{esc(x.get('區域', ''))}' 
+               data-type='{esc(x.get('類型', ''))}' 
+               data-rooms='{esc(rooms)}'
+               data-price='{price}'>
                 <div class='card'>
                     <div class='card-img-wrapper'>
-                        <img src='{img_url}' class='card-img' alt='{esc(x.get('案名'))}'>
+                        <img src='{img_url}' class='card-img' alt='{esc(x.get('案名', ''))}'>
                         <div class='card-badge'>精選物件</div>
                     </div>
                     <div class='card-body'>
-                        <div class='card-area'>{esc(x.get('區域'))}</div>
-                        <h3 class='card-title'>{esc(x.get('案名'))}</h3>
-                        <div class='card-price'>{esc(x.get('價格'))} <span>萬</span></div>
+                        <div class='card-area'>{esc(x.get('區域', ''))}</div>
+                        <h3 class='card-title'>{esc(x.get('案名', ''))}</h3>
+                        <div class='card-price'>{esc(price)} <span>萬</span></div>
                     </div>
                 </div>
             </a>
             """
         
+        # 建立首頁
         home = f"""
         <nav class="navbar">
             <a href="#" class="logo">SK-L REAL ESTATE</a>
             <ul class="nav-links">
+                <li><a href="#map">地圖搜尋</a></li>
                 <li><a href="#properties">精選物件</a></li>
                 <li><a href="#about">關於我們</a></li>
                 <li><a href="{AGENT_INFO['line']}">聯絡我們</a></li>
@@ -786,27 +906,45 @@ class SKL_Agency:
             </div>
         </section>
         
-        <div id="map"></div>
-        
-        <div class="search-section">
-            <div class="search-field">
-                <label>行政區域</label>
-                <select id="s-area">
-                    <option value="all">台中全區</option>
-                    {opts}
-                </select>
+        <div class="map-container" id="map-section">
+            <div class="filter-bar">
+                <div class="filter-group">
+                    <label>區域</label>
+                    <select id="filter-area">
+                        <option value="all">全部區域</option>
+                        {area_opts}
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>類型</label>
+                    <select id="filter-type">
+                        <option value="all">全部類型</option>
+                        {type_opts}
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>房數</label>
+                    <select id="filter-rooms">
+                        <option value="all">不限</option>
+                        <option value="1">1房</option>
+                        <option value="2">2房</option>
+                        <option value="3">3房</option>
+                        <option value="4">4房以上</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>價格區間</label>
+                    <select id="filter-price">
+                        <option value="all">不限</option>
+                        <option value="0-1000">1000萬以下</option>
+                        <option value="1000-2000">1000-2000萬</option>
+                        <option value="2000-3000">2000-3000萬</option>
+                        <option value="3000-99999">3000萬以上</option>
+                    </select>
+                </div>
+                <button class="filter-btn" onclick="filterProperties()">🔍 搜尋</button>
             </div>
-            <div class="search-field">
-                <label>價格範圍</label>
-                <select id="s-price">
-                    <option value="all">不限</option>
-                    <option value="0-1000">1000萬以下</option>
-                    <option value="1000-2000">1000-2000萬</option>
-                    <option value="2000-3000">2000-3000萬</option>
-                    <option value="3000+">3000萬以上</option>
-                </select>
-            </div>
-            <button class="btn-search" onclick="filterProperties()">搜尋物件</button>
+            <div id="map"></div>
         </div>
         
         <h2 class="section-title" id="properties">精選物件</h2>
@@ -827,23 +965,17 @@ class SKL_Agency:
             <a class="btn-contact btn-line" href="{AGENT_INFO['line']}">💬 LINE 諮詢</a>
             <a class="btn-contact btn-phone" href="tel:{AGENT_INFO['phone']}">📞 {AGENT_INFO['phone']}</a>
         </div>
-        
-        <script>
-            function filterProperties() {{
-                const area = document.getElementById('s-area').value;
-                const cards = document.querySelectorAll('.card-anchor');
-                cards.forEach(card => {{
-                    if (area === 'all' || card.dataset.area === area) {{
-                        card.style.display = 'block';
-                    }} else {{
-                        card.style.display = 'none';
-                    }}
-                }});
-            }}
-        </script>
         """
         
         Path("index.html").write_text(self.build_layout(SITE_TITLE, home, True), encoding="utf-8")
+        print(f"✅ 成功生成 {len(self.items)} 個物件頁面")
 
 if __name__ == "__main__":
-    SKL_Agency().run()
+    try:
+        agency = SKL_Agency()
+        agency.run()
+        print("✅ 網站生成完成！")
+    except Exception as e:
+        print(f"❌ 錯誤：{e}")
+        import traceback
+        traceback.print_exc()

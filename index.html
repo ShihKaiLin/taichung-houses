@@ -11,7 +11,8 @@
     
     :root {
         --primary-navy: #003D5C;
-        --primary-green: #2EAD7D;
+        --primary-green: #4CAF50;
+        --primary-blue: #2196F3;
         --accent-gold: #D4AF37;
         --bg-light: #F5F7FA;
         --bg-white: #FFFFFF;
@@ -101,7 +102,7 @@
     .hero {
         height: 75vh;
         min-height: 600px;
-        background: linear-gradient(135deg, rgba(0,61,92,0.85) 0%, rgba(46,173,125,0.65) 100%), 
+        background: linear-gradient(135deg, rgba(0,61,92,0.85) 0%, rgba(76,175,80,0.65) 100%), 
                     url('https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1920&q=80') center/cover;
         display: flex;
         align-items: center;
@@ -157,82 +158,88 @@
         }
     }
     
-    /* ========== 地圖區域 ========== */
-    #map {
-        height: 500px;
+    /* ========== 地圖容器（全寬度） ========== */
+    .map-container {
         width: 100%;
-        filter: grayscale(40%) contrast(95%);
-        border-bottom: 1px solid var(--border-light);
-    }
-    
-    /* ========== 搜尋區域 ========== */
-    .search-section {
-        width: 90%;
-        max-width: 1200px;
-        margin: -70px auto 80px;
-        background: var(--bg-white);
-        padding: 45px 50px;
-        border-radius: 20px;
-        box-shadow: var(--shadow-lg);
         position: relative;
-        z-index: 1000;
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 25px;
-        align-items: flex-end;
+        background: var(--bg-white);
+        box-shadow: var(--shadow-sm);
     }
     
-    .search-field {
+    /* ========== 頂部橫向篩選列 ========== */
+    .filter-bar {
+        width: 100%;
+        background: var(--bg-white);
+        padding: 20px 40px;
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        flex-wrap: wrap;
+        border-bottom: 2px solid var(--border-light);
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .filter-group {
         display: flex;
         flex-direction: column;
-        gap: 10px;
+        gap: 5px;
+        min-width: 150px;
+        flex: 1;
     }
     
-    .search-field label {
+    .filter-group label {
         font-weight: 600;
-        font-size: 14px;
+        font-size: 13px;
         color: var(--text-gray);
         text-transform: uppercase;
-        letter-spacing: 1px;
+        letter-spacing: 0.5px;
     }
     
-    .search-field select,
-    .search-field input {
+    .filter-group select {
         width: 100%;
-        padding: 14px 18px;
+        padding: 12px 15px;
         border: 2px solid var(--border-light);
-        border-radius: 10px;
-        font-size: 16px;
+        border-radius: 8px;
+        font-size: 15px;
         font-family: 'Noto Sans TC', sans-serif;
         transition: all 0.3s ease;
         background: var(--bg-white);
+        cursor: pointer;
     }
     
-    .search-field select:focus,
-    .search-field input:focus {
+    .filter-group select:focus {
         outline: none;
         border-color: var(--primary-green);
-        box-shadow: 0 0 0 3px rgba(46,173,125,0.1);
+        box-shadow: 0 0 0 3px rgba(76,175,80,0.1);
     }
     
-    .btn-search {
-        padding: 14px 40px;
+    .filter-btn {
+        padding: 12px 35px;
         background: var(--primary-green);
         color: var(--bg-white);
         border: none;
-        border-radius: 10px;
-        font-size: 16px;
+        border-radius: 8px;
+        font-size: 15px;
         font-weight: 700;
         cursor: pointer;
         transition: all 0.3s ease;
         text-transform: uppercase;
         letter-spacing: 1px;
+        margin-top: auto;
+        box-shadow: 0 2px 8px rgba(76,175,80,0.3);
     }
     
-    .btn-search:hover {
-        background: #26976B;
+    .filter-btn:hover {
+        background: #45a049;
         transform: translateY(-2px);
-        box-shadow: var(--shadow-md);
+        box-shadow: 0 4px 12px rgba(76,175,80,0.4);
+    }
+    
+    /* ========== 地圖區域（全寬度） ========== */
+    #map {
+        height: 600px;
+        width: 100%;
+        filter: grayscale(20%) contrast(100%);
     }
     
     /* ========== 物件網格 ========== */
@@ -451,9 +458,9 @@
     }
     
     .btn-phone:hover {
-        background: #26976B;
+        background: #45a049;
         transform: translateY(-3px);
-        box-shadow: 0 8px 20px rgba(46,173,125,0.4);
+        box-shadow: 0 8px 20px rgba(76,175,80,0.4);
     }
     
     /* ========== 詳細頁面 ========== */
@@ -531,6 +538,10 @@
             max-width: 450px;
             height: 500px;
         }
+        
+        .filter-bar {
+            padding: 15px 20px;
+        }
     }
     
     @media (max-width: 768px) {
@@ -561,10 +572,22 @@
             font-size: 18px;
         }
         
-        .search-section {
-            grid-template-columns: 1fr;
-            padding: 35px 30px;
-            margin: -50px 20px 60px;
+        .filter-bar {
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .filter-group {
+            width: 100%;
+            min-width: auto;
+        }
+        
+        .filter-btn {
+            width: 100%;
+        }
+        
+        #map {
+            height: 400px;
         }
         
         .grid {
@@ -620,45 +643,109 @@
     
             <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDzgnI2Ucv622CRkWwo2GE5JRrs_Y4HQY0&callback=initMap" async defer></script>
             <script>
+                let map;
+                let markers = [];
+                let infoWindow;
+                
                 function initMap() {
-                    const map = new google.maps.Map(document.getElementById('map'), { 
+                    map = new google.maps.Map(document.getElementById('map'), { 
                         center: {lat:24.162, lng:120.647}, 
-                        zoom:13, 
-                        disableDefaultUI:true, 
-                        styles:[{"featureType":"all","stylers":[{"saturation":-40},{"lightness":10}]}] 
+                        zoom:12, 
+                        disableDefaultUI: false,
+                        zoomControl: true,
+                        mapTypeControl: false,
+                        streetViewControl: false,
+                        fullscreenControl: true,
+                        styles: [
+                            {
+                                "featureType": "all",
+                                "elementType": "geometry",
+                                "stylers": [{"saturation": -20}]
+                            },
+                            {
+                                "featureType": "water",
+                                "elementType": "geometry.fill",
+                                "stylers": [{"color": "#c8d7d4}]
+                            }
+                        ]
                     });
-                    const iw = new google.maps.InfoWindow();
+                    
+                    infoWindow = new google.maps.InfoWindow();
                     const pts = [];
-                    pts.forEach(p => {
-                        const m = new google.maps.Marker({ 
-                            position:{lat:parseFloat(p.lat), lng:parseFloat(p.lng)}, 
-                            map,
+                    
+                    pts.forEach((p, index) => {
+                        // 創建自定義藍色圓形標記，帶房屋圖示
+                        const marker = new google.maps.Marker({ 
+                            position: {lat: parseFloat(p.lat), lng: parseFloat(p.lng)}, 
+                            map: map,
                             icon: {
                                 path: google.maps.SymbolPath.CIRCLE,
-                                scale: 10,
-                                fillColor: '#2EAD7D',
+                                scale: 12,
+                                fillColor: '#2196F3',
                                 fillOpacity: 1,
                                 strokeColor: '#FFFFFF',
                                 strokeWeight: 3
+                            },
+                            title: p.name,
+                            animation: google.maps.Animation.DROP
+                        });
+                        
+                        marker.addListener('click', () => { 
+                            infoWindow.setContent(`
+                                <div style="padding:15px;width:220px;font-family:'Noto Sans TC',sans-serif;">
+                                    <img src="${p.img}" style="width:100%;border-radius:8px;margin-bottom:10px;" alt="${p.name}">
+                                    <h4 style="margin:8px 0;font-size:16px;color:#1A1A1A;font-weight:700;">${p.name}</h4>
+                                    <div style="font-size:22px;font-weight:900;color:#4CAF50;margin:8px 0;">${p.price}萬</div>
+                                    <a href="${p.url}" style="display:inline-block;margin-top:10px;padding:10px 20px;background:#4CAF50;color:#fff;text-decoration:none;border-radius:8px;font-size:14px;font-weight:700;">查看詳情</a>
+                                </div>
+                            `); 
+                            infoWindow.open(map, marker); 
+                        });
+                        
+                        markers.push(marker);
+                    });
+                }
+                
+                // 篩選功能
+                function filterProperties() {
+                    const area = document.getElementById('filter-area').value;
+                    const type = document.getElementById('filter-type').value;
+                    const rooms = document.getElementById('filter-rooms').value;
+                    const price = document.getElementById('filter-price').value;
+                    
+                    const cards = document.querySelectorAll('.card-anchor');
+                    cards.forEach(card => {
+                        const cardArea = card.dataset.area || '';
+                        const cardType = card.dataset.type || '';
+                        const cardRooms = card.dataset.rooms || '';
+                        const cardPrice = parseFloat(card.dataset.price) || 0;
+                        
+                        let show = true;
+                        
+                        if (area !== 'all' && cardArea !== area) show = false;
+                        if (type !== 'all' && cardType !== type) show = false;
+                        if (rooms !== 'all' && cardRooms !== rooms) show = false;
+                        
+                        if (price !== 'all') {
+                            const [min, max] = price.split('-').map(p => parseFloat(p) || Infinity);
+                            if (max) {
+                                if (cardPrice < min || cardPrice > max) show = false;
+                            } else {
+                                if (cardPrice < min) show = false;
                             }
-                        });
-                        m.addListener('click', () => { 
-                            iw.setContent(`<div style="padding:15px;width:200px;font-family:'Noto Sans TC',sans-serif;">
-                                <img src="${p.img}" style="width:100%;border-radius:8px;margin-bottom:10px;">
-                                <h4 style="margin:8px 0;font-size:16px;color:#1A1A1A;">${p.name}</h4>
-                                <div style="font-size:20px;font-weight:700;color:#2EAD7D;margin:8px 0;">${p.price}萬</div>
-                                <a href="${p.url}" style="display:inline-block;margin-top:10px;padding:8px 16px;background:#2EAD7D;color:#fff;text-decoration:none;border-radius:6px;font-size:14px;font-weight:600;">查看詳情</a>
-                            </div>`); 
-                            iw.open(map, m); 
-                        });
+                        }
+                        
+                        card.style.display = show ? 'block' : 'none';
                     });
                 }
             </script>
+            
 </head>
 <body>
         <nav class="navbar">
             <a href="#" class="logo">SK-L REAL ESTATE</a>
             <ul class="nav-links">
+                <li><a href="#map">地圖搜尋</a></li>
                 <li><a href="#properties">精選物件</a></li>
                 <li><a href="#about">關於我們</a></li>
                 <li><a href="https://line.me/ti/p/FDsMyAYDv_">聯絡我們</a></li>
@@ -672,33 +759,55 @@
             </div>
         </section>
         
-        <div id="map"></div>
-        
-        <div class="search-section">
-            <div class="search-field">
-                <label>行政區域</label>
-                <select id="s-area">
-                    <option value="all">台中全區</option>
-                    <option value='北屯區'>北屯區</option><option value='南區'>南區</option><option value='南屯區'>南屯區</option><option value='大里區'>大里區</option><option value='沙鹿區'>沙鹿區</option><option value='西區'>西區</option><option value='西屯區'>西屯區</option><option value='豐原區'>豐原區</option>
-                </select>
+        <div class="map-container" id="map-section">
+            <div class="filter-bar">
+                <div class="filter-group">
+                    <label>區域</label>
+                    <select id="filter-area">
+                        <option value="all">全部區域</option>
+                        <option value='北屯區'>北屯區</option><option value='南區'>南區</option><option value='南屯區'>南屯區</option><option value='大里區'>大里區</option><option value='沙鹿區'>沙鹿區</option><option value='西區'>西區</option><option value='西屯區'>西屯區</option><option value='豐原區'>豐原區</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>類型</label>
+                    <select id="filter-type">
+                        <option value="all">全部類型</option>
+                        
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>房數</label>
+                    <select id="filter-rooms">
+                        <option value="all">不限</option>
+                        <option value="1">1房</option>
+                        <option value="2">2房</option>
+                        <option value="3">3房</option>
+                        <option value="4">4房以上</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>價格區間</label>
+                    <select id="filter-price">
+                        <option value="all">不限</option>
+                        <option value="0-1000">1000萬以下</option>
+                        <option value="1000-2000">1000-2000萬</option>
+                        <option value="2000-3000">2000-3000萬</option>
+                        <option value="3000-99999">3000萬以上</option>
+                    </select>
+                </div>
+                <button class="filter-btn" onclick="filterProperties()">🔍 搜尋</button>
             </div>
-            <div class="search-field">
-                <label>價格範圍</label>
-                <select id="s-price">
-                    <option value="all">不限</option>
-                    <option value="0-1000">1000萬以下</option>
-                    <option value="1000-2000">1000-2000萬</option>
-                    <option value="2000-3000">2000-3000萬</option>
-                    <option value="3000+">3000萬以上</option>
-                </select>
-            </div>
-            <button class="btn-search" onclick="filterProperties()">搜尋物件</button>
+            <div id="map"></div>
         </div>
         
         <h2 class="section-title" id="properties">精選物件</h2>
         <div class="grid" id="property-grid">
             
-            <a href='/taichung-houses/p11/' class='card-anchor' data-area='大里區'>
+            <a href='/taichung-houses/p11/' class='card-anchor' 
+               data-area='大里區' 
+               data-type='' 
+               data-rooms=''
+               data-price='2,990 萬'>
                 <div class='card'>
                     <div class='card-img-wrapper'>
                         <img src='' class='card-img' alt='新時代別墅 M012'>
@@ -712,7 +821,11 @@
                 </div>
             </a>
             
-            <a href='/taichung-houses/p10/' class='card-anchor' data-area='南屯區'>
+            <a href='/taichung-houses/p10/' class='card-anchor' 
+               data-area='南屯區' 
+               data-type='' 
+               data-rooms=''
+               data-price='1,350 萬'>
                 <div class='card'>
                     <div class='card-img-wrapper'>
                         <img src='' class='card-img' alt='五期美寓 L011'>
@@ -726,7 +839,11 @@
                 </div>
             </a>
             
-            <a href='/taichung-houses/p9/' class='card-anchor' data-area='西屯區'>
+            <a href='/taichung-houses/p9/' class='card-anchor' 
+               data-area='西屯區' 
+               data-type='' 
+               data-rooms=''
+               data-price='3,800 萬'>
                 <div class='card'>
                     <div class='card-img-wrapper'>
                         <img src='' class='card-img' alt='逢甲商辦 K010'>
@@ -740,7 +857,11 @@
                 </div>
             </a>
             
-            <a href='/taichung-houses/p8/' class='card-anchor' data-area='沙鹿區'>
+            <a href='/taichung-houses/p8/' class='card-anchor' 
+               data-area='沙鹿區' 
+               data-type='' 
+               data-rooms=''
+               data-price='450 萬'>
                 <div class='card'>
                     <div class='card-img-wrapper'>
                         <img src='' class='card-img' alt='靜宜學區套房 J009'>
@@ -754,7 +875,11 @@
                 </div>
             </a>
             
-            <a href='/taichung-houses/p7/' class='card-anchor' data-area='北屯區'>
+            <a href='/taichung-houses/p7/' class='card-anchor' 
+               data-area='北屯區' 
+               data-type='' 
+               data-rooms=''
+               data-price='2,150 萬'>
                 <div class='card'>
                     <div class='card-img-wrapper'>
                         <img src='' class='card-img' alt='水岸華廈 I008'>
@@ -768,7 +893,11 @@
                 </div>
             </a>
             
-            <a href='/taichung-houses/p6/' class='card-anchor' data-area='大里區'>
+            <a href='/taichung-houses/p6/' class='card-anchor' 
+               data-area='大里區' 
+               data-type='' 
+               data-rooms=''
+               data-price='680 萬'>
                 <div class='card'>
                     <div class='card-img-wrapper'>
                         <img src='' class='card-img' alt='首購公寓 H007'>
@@ -782,7 +911,11 @@
                 </div>
             </a>
             
-            <a href='/taichung-houses/p5/' class='card-anchor' data-area='豐原區'>
+            <a href='/taichung-houses/p5/' class='card-anchor' 
+               data-area='豐原區' 
+               data-type='' 
+               data-rooms=''
+               data-price='1,650 萬'>
                 <div class='card'>
                     <div class='card-img-wrapper'>
                         <img src='' class='card-img' alt='田園透天 G006'>
@@ -796,7 +929,11 @@
                 </div>
             </a>
             
-            <a href='/taichung-houses/p4/' class='card-anchor' data-area='南屯區'>
+            <a href='/taichung-houses/p4/' class='card-anchor' 
+               data-area='南屯區' 
+               data-type='' 
+               data-rooms=''
+               data-price='1698萬'>
                 <div class='card'>
                     <div class='card-img-wrapper'>
                         <img src='' class='card-img' alt='文心森林公園【大有可為】3+1房附休旅車位捷運宅'>
@@ -810,7 +947,11 @@
                 </div>
             </a>
             
-            <a href='/taichung-houses/p3/' class='card-anchor' data-area='南區'>
+            <a href='/taichung-houses/p3/' class='card-anchor' 
+               data-area='南區' 
+               data-type='' 
+               data-rooms=''
+               data-price='1766萬'>
                 <div class='card'>
                     <div class='card-img-wrapper'>
                         <img src='' class='card-img' alt='中山醫大慶捷運站之悠森學首購好宅'>
@@ -824,7 +965,11 @@
                 </div>
             </a>
             
-            <a href='/taichung-houses/p2/' class='card-anchor' data-area='西區'>
+            <a href='/taichung-houses/p2/' class='card-anchor' 
+               data-area='西區' 
+               data-type='' 
+               data-rooms=''
+               data-price='2188萬'>
                 <div class='card'>
                     <div class='card-img-wrapper'>
                         <img src='' class='card-img' alt='國美特區【宏台美術館】高樓層優質三房B1平車'>
@@ -838,7 +983,11 @@
                 </div>
             </a>
             
-            <a href='/taichung-houses/p1/' class='card-anchor' data-area='沙鹿區'>
+            <a href='/taichung-houses/p1/' class='card-anchor' 
+               data-area='沙鹿區' 
+               data-type='' 
+               data-rooms=''
+               data-price='2,758 萬'>
                 <div class='card'>
                     <div class='card-img-wrapper'>
                         <img src='' class='card-img' alt='專任沙鹿北勢國小過洋居全新電梯雙車別墅C10'>
@@ -852,7 +1001,11 @@
                 </div>
             </a>
             
-            <a href='/taichung-houses/p0/' class='card-anchor' data-area='沙鹿區'>
+            <a href='/taichung-houses/p0/' class='card-anchor' 
+               data-area='沙鹿區' 
+               data-type='' 
+               data-rooms=''
+               data-price='2,798萬'>
                 <div class='card'>
                     <div class='card-img-wrapper'>
                         <img src='' class='card-img' alt='專任沙鹿北勢國小過洋居全新電梯雙車別墅C1'>
@@ -881,19 +1034,5 @@
             <a class="btn-contact btn-line" href="https://line.me/ti/p/FDsMyAYDv_">💬 LINE 諮詢</a>
             <a class="btn-contact btn-phone" href="tel:0938-615-351">📞 0938-615-351</a>
         </div>
-        
-        <script>
-            function filterProperties() {
-                const area = document.getElementById('s-area').value;
-                const cards = document.querySelectorAll('.card-anchor');
-                cards.forEach(card => {
-                    if (area === 'all' || card.dataset.area === area) {
-                        card.style.display = 'block';
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
-            }
-        </script>
         </body>
 </html>

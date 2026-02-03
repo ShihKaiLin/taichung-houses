@@ -11,7 +11,8 @@
     
     :root {
         --primary-navy: #003D5C;
-        --primary-green: #2EAD7D;
+        --primary-green: #4CAF50;
+        --primary-blue: #2196F3;
         --accent-gold: #D4AF37;
         --bg-light: #F5F7FA;
         --bg-white: #FFFFFF;
@@ -101,7 +102,7 @@
     .hero {
         height: 75vh;
         min-height: 600px;
-        background: linear-gradient(135deg, rgba(0,61,92,0.85) 0%, rgba(46,173,125,0.65) 100%), 
+        background: linear-gradient(135deg, rgba(0,61,92,0.85) 0%, rgba(76,175,80,0.65) 100%), 
                     url('https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1920&q=80') center/cover;
         display: flex;
         align-items: center;
@@ -157,82 +158,88 @@
         }
     }
     
-    /* ========== 地圖區域 ========== */
-    #map {
-        height: 500px;
+    /* ========== 地圖容器（全寬度） ========== */
+    .map-container {
         width: 100%;
-        filter: grayscale(40%) contrast(95%);
-        border-bottom: 1px solid var(--border-light);
-    }
-    
-    /* ========== 搜尋區域 ========== */
-    .search-section {
-        width: 90%;
-        max-width: 1200px;
-        margin: -70px auto 80px;
-        background: var(--bg-white);
-        padding: 45px 50px;
-        border-radius: 20px;
-        box-shadow: var(--shadow-lg);
         position: relative;
-        z-index: 1000;
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 25px;
-        align-items: flex-end;
+        background: var(--bg-white);
+        box-shadow: var(--shadow-sm);
     }
     
-    .search-field {
+    /* ========== 頂部橫向篩選列 ========== */
+    .filter-bar {
+        width: 100%;
+        background: var(--bg-white);
+        padding: 20px 40px;
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        flex-wrap: wrap;
+        border-bottom: 2px solid var(--border-light);
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .filter-group {
         display: flex;
         flex-direction: column;
-        gap: 10px;
+        gap: 5px;
+        min-width: 150px;
+        flex: 1;
     }
     
-    .search-field label {
+    .filter-group label {
         font-weight: 600;
-        font-size: 14px;
+        font-size: 13px;
         color: var(--text-gray);
         text-transform: uppercase;
-        letter-spacing: 1px;
+        letter-spacing: 0.5px;
     }
     
-    .search-field select,
-    .search-field input {
+    .filter-group select {
         width: 100%;
-        padding: 14px 18px;
+        padding: 12px 15px;
         border: 2px solid var(--border-light);
-        border-radius: 10px;
-        font-size: 16px;
+        border-radius: 8px;
+        font-size: 15px;
         font-family: 'Noto Sans TC', sans-serif;
         transition: all 0.3s ease;
         background: var(--bg-white);
+        cursor: pointer;
     }
     
-    .search-field select:focus,
-    .search-field input:focus {
+    .filter-group select:focus {
         outline: none;
         border-color: var(--primary-green);
-        box-shadow: 0 0 0 3px rgba(46,173,125,0.1);
+        box-shadow: 0 0 0 3px rgba(76,175,80,0.1);
     }
     
-    .btn-search {
-        padding: 14px 40px;
+    .filter-btn {
+        padding: 12px 35px;
         background: var(--primary-green);
         color: var(--bg-white);
         border: none;
-        border-radius: 10px;
-        font-size: 16px;
+        border-radius: 8px;
+        font-size: 15px;
         font-weight: 700;
         cursor: pointer;
         transition: all 0.3s ease;
         text-transform: uppercase;
         letter-spacing: 1px;
+        margin-top: auto;
+        box-shadow: 0 2px 8px rgba(76,175,80,0.3);
     }
     
-    .btn-search:hover {
-        background: #26976B;
+    .filter-btn:hover {
+        background: #45a049;
         transform: translateY(-2px);
-        box-shadow: var(--shadow-md);
+        box-shadow: 0 4px 12px rgba(76,175,80,0.4);
+    }
+    
+    /* ========== 地圖區域（全寬度） ========== */
+    #map {
+        height: 600px;
+        width: 100%;
+        filter: grayscale(20%) contrast(100%);
     }
     
     /* ========== 物件網格 ========== */
@@ -451,9 +458,9 @@
     }
     
     .btn-phone:hover {
-        background: #26976B;
+        background: #45a049;
         transform: translateY(-3px);
-        box-shadow: 0 8px 20px rgba(46,173,125,0.4);
+        box-shadow: 0 8px 20px rgba(76,175,80,0.4);
     }
     
     /* ========== 詳細頁面 ========== */
@@ -531,6 +538,10 @@
             max-width: 450px;
             height: 500px;
         }
+        
+        .filter-bar {
+            padding: 15px 20px;
+        }
     }
     
     @media (max-width: 768px) {
@@ -561,10 +572,22 @@
             font-size: 18px;
         }
         
-        .search-section {
-            grid-template-columns: 1fr;
-            padding: 35px 30px;
-            margin: -50px 20px 60px;
+        .filter-bar {
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .filter-group {
+            width: 100%;
+            min-width: auto;
+        }
+        
+        .filter-btn {
+            width: 100%;
+        }
+        
+        #map {
+            height: 400px;
         }
         
         .grid {

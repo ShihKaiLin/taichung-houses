@@ -940,64 +940,70 @@
                 var markers = [];
                 var infoWindow;
                 
+                // 初始化地圖函數（暴露到 window 供 Google Maps callback 使用）
                 window.initMap = function() {
-                    map = new google.maps.Map(document.getElementById('map'), { 
-                        center: {lat:24.162, lng:120.647}, 
-                        zoom:12, 
-                        disableDefaultUI: false,
-                        zoomControl: true,
-                        mapTypeControl: false,
-                        streetViewControl: false,
-                        fullscreenControl: true,
-                        styles: [
-                            {
-                                "featureType": "all",
-                                "elementType": "geometry",
-                                "stylers": [{"saturation": -20}]
-                            },
-                            {
-                                "featureType": "water",
-                                "elementType": "geometry.fill",
-                                "stylers": [{"color": "#c8d7d4}]
-                            }
-                        ]
-                    });
-                    
-                    infoWindow = new google.maps.InfoWindow();
-                    const pts = [{"name": "專任沙鹿北勢國小過洋居全新電梯雙車別墅C1", "price": "2,798萬", "img": "https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/h01.jpg", "url": "/taichung-houses/p0/", "lat": 24.223270342067526, "lng": 120.56226324313322}, {"name": "專任沙鹿北勢國小過洋居全新電梯雙車別墅C10", "price": "2,758 萬", "img": "https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/h02.jpg", "url": "/taichung-houses/p1/", "lat": 24.22883414256722, "lng": 120.57575338066708}, {"name": "國美特區【宏台美術館】高樓層優質三房B1平車", "price": "2188萬", "img": "https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/h03.jpg", "url": "/taichung-houses/p2/", "lat": 24.135715648173456, "lng": 120.67868842113707}, {"name": "中山醫大慶捷運站之悠森學首購好宅", "price": "1766萬", "img": "https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/YA0045896-1.jpg", "url": "/taichung-houses/p3/", "lat": 24.1009333169487, "lng": 120.66029901208007}, {"name": "文心森林公園【大有可為】3+1房附休旅車位捷運宅", "price": "1698萬", "img": "https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/n05.jpg", "url": "/taichung-houses/p4/", "lat": 24.14730085938119, "lng": 120.61299306772139}, {"name": "田園透天 G006", "price": "1,650 萬", "img": "https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/f06.jpg", "url": "/taichung-houses/p5/", "lat": 24.250618690027643, "lng": 120.72503037448226}, {"name": "首購公寓 H007", "price": "680 萬", "img": "https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/d07.jpg", "url": "/taichung-houses/p6/", "lat": 24.092411033377438, "lng": 120.68717092248616}, {"name": "水岸華廈 I008", "price": "2,150 萬", "img": "https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/b08.jpg", "url": "/taichung-houses/p7/", "lat": 24.188310404606995, "lng": 120.73991543945993}, {"name": "靜宜學區套房 J009", "price": "450 萬", "img": "https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/s09.jpg", "url": "/taichung-houses/p8/", "lat": 24.22916062853561, "lng": 120.56022234733422}, {"name": "逢甲商辦 K010", "price": "3,800 萬", "img": "https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/x10.jpg", "url": "/taichung-houses/p9/", "lat": 24.176820763129342, "lng": 120.62593084209084}, {"name": "五期美寓 L011", "price": "1,350 萬", "img": "https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/n11.jpg", "url": "/taichung-houses/p10/", "lat": 24.143145041314856, "lng": 120.61903054448872}, {"name": "新時代別墅 M012", "price": "2,990 萬", "img": "https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/d12.jpg", "url": "/taichung-houses/p11/", "lat": 24.09673685024948, "lng": 120.67674763195319}];
-                    
-                    pts.forEach((p, index) => {
-                        // 創建自定義藍色圓形標記，帶房屋圖示
-                        const marker = new google.maps.Marker({ 
-                            position: {lat: parseFloat(p.lat), lng: parseFloat(p.lng)}, 
-                            map: map,
-                            icon: {
-                                path: google.maps.SymbolPath.CIRCLE,
-                                scale: 12,
-                                fillColor: '#2196F3',
-                                fillOpacity: 1,
-                                strokeColor: '#FFFFFF',
-                                strokeWeight: 3
-                            },
-                            title: p.name,
-                            animation: google.maps.Animation.DROP
+                    if (typeof google !== 'undefined' && typeof google.maps !== 'undefined') {
+                        // 初始化地圖
+                        map = new google.maps.Map(document.getElementById('map'), { 
+                            center: {lat:24.162, lng:120.647}, 
+                            zoom:12, 
+                            disableDefaultUI: false,
+                            zoomControl: true,
+                            mapTypeControl: false,
+                            streetViewControl: false,
+                            fullscreenControl: true,
+                            styles: [
+                                {
+                                    "featureType": "all",
+                                    "elementType": "geometry",
+                                    "stylers": [{"saturation": -20}]
+                                },
+                                {
+                                    "featureType": "water",
+                                    "elementType": "geometry.fill",
+                                    "stylers": [{"color": "#c8d7d4"}]
+                                }
+                            ]
                         });
                         
-                        marker.addListener('click', () => { 
-                            infoWindow.setContent(`
-                                <div style="padding:15px;width:220px;font-family:'Noto Sans TC',sans-serif;">
-                                    <img src="${p.img}" style="width:100%;border-radius:8px;margin-bottom:10px;" alt="${p.name}">
-                                    <h4 style="margin:8px 0;font-size:16px;color:#1A1A1A;font-weight:700;">${p.name}</h4>
-                                    <div style="font-size:22px;font-weight:900;color:#4CAF50;margin:8px 0;">${p.price}萬</div>
-                                    <a href="${p.url}" style="display:inline-block;margin-top:10px;padding:10px 20px;background:#4CAF50;color:#fff;text-decoration:none;border-radius:8px;font-size:14px;font-weight:700;">查看詳情</a>
-                                </div>
-                            `); 
-                            infoWindow.open(map, marker); 
-                        });
+                        infoWindow = new google.maps.InfoWindow();
+                        const pts = [{"name": "專任沙鹿北勢國小過洋居全新電梯雙車別墅C1", "price": "2,798萬", "img": "https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/h01.jpg", "url": "/taichung-houses/p0/", "lat": 24.2218233892131, "lng": 120.57765620610297}, {"name": "專任沙鹿北勢國小過洋居全新電梯雙車別墅C10", "price": "2,758 萬", "img": "https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/h02.jpg", "url": "/taichung-houses/p1/", "lat": 24.22287939662678, "lng": 120.57123076782997}, {"name": "國美特區【宏台美術館】高樓層優質三房B1平車", "price": "2188萬", "img": "https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/h03.jpg", "url": "/taichung-houses/p2/", "lat": 24.139983931416634, "lng": 120.66784452180173}, {"name": "中山醫大慶捷運站之悠森學首購好宅", "price": "1766萬", "img": "https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/YA0045896-1.jpg", "url": "/taichung-houses/p3/", "lat": 24.091208026207855, "lng": 120.6587098855249}, {"name": "文心森林公園【大有可為】3+1房附休旅車位捷運宅", "price": "1698萬", "img": "https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/n05.jpg", "url": "/taichung-houses/p4/", "lat": 24.135782705108053, "lng": 120.61299135117098}, {"name": "田園透天 G006", "price": "1,650 萬", "img": "https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/f06.jpg", "url": "/taichung-houses/p5/", "lat": 24.261745830863173, "lng": 120.73294515566995}, {"name": "首購公寓 H007", "price": "680 萬", "img": "https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/d07.jpg", "url": "/taichung-houses/p6/", "lat": 24.093008242525528, "lng": 120.68399232346432}, {"name": "水岸華廈 I008", "price": "2,150 萬", "img": "https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/b08.jpg", "url": "/taichung-houses/p7/", "lat": 24.17480334304326, "lng": 120.74027231486988}, {"name": "靜宜學區套房 J009", "price": "450 萬", "img": "https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/s09.jpg", "url": "/taichung-houses/p8/", "lat": 24.220852358017613, "lng": 120.56276816712221}, {"name": "逢甲商辦 K010", "price": "3,800 萬", "img": "https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/x10.jpg", "url": "/taichung-houses/p9/", "lat": 24.189282027918406, "lng": 120.62536344159084}, {"name": "五期美寓 L011", "price": "1,350 萬", "img": "https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/n11.jpg", "url": "/taichung-houses/p10/", "lat": 24.13849227176902, "lng": 120.61949737561348}, {"name": "新時代別墅 M012", "price": "2,990 萬", "img": "https://raw.githubusercontent.com/ShihKaiLin/taichung-houses/main/images/d12.jpg", "url": "/taichung-houses/p11/", "lat": 24.103850131476694, "lng": 120.67432347011399}];
                         
-                        markers.push(marker);
-                    });
+                        pts.forEach((p, index) => {
+                            // 創建自定義藍色圓形標記，帶房屋圖示
+                            const marker = new google.maps.Marker({ 
+                                position: {lat: parseFloat(p.lat), lng: parseFloat(p.lng)}, 
+                                map: map,
+                                icon: {
+                                    path: google.maps.SymbolPath.CIRCLE,
+                                    scale: 12,
+                                    fillColor: '#2196F3',
+                                    fillOpacity: 1,
+                                    strokeColor: '#FFFFFF',
+                                    strokeWeight: 3
+                                },
+                                title: p.name,
+                                animation: google.maps.Animation.DROP
+                            });
+                            
+                            marker.addListener('click', () => { 
+                                infoWindow.setContent(`
+                                    <div style="padding:15px;width:220px;font-family:'Noto Sans TC',sans-serif;">
+                                        <img src="${p.img}" style="width:100%;border-radius:8px;margin-bottom:10px;" alt="${p.name}">
+                                        <h4 style="margin:8px 0;font-size:16px;color:#1A1A1A;font-weight:700;">${p.name}</h4>
+                                        <div style="font-size:22px;font-weight:900;color:#4CAF50;margin:8px 0;">${p.price}萬</div>
+                                        <a href="${p.url}" style="display:inline-block;margin-top:10px;padding:10px 20px;background:#4CAF50;color:#fff;text-decoration:none;border-radius:8px;font-size:14px;font-weight:700;">查看詳情</a>
+                                    </div>
+                                `); 
+                                infoWindow.open(map, marker); 
+                            });
+                            
+                            markers.push(marker);
+                        });
+                    }
                 }
+                
+
                 
                 // 篩選功能
                 window.filterProperties = function() {
@@ -1032,6 +1038,6 @@
                     });
                 }
             </script>
-            <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDzgnI2Ucv622CRkWwo2GE5JRrs_Y4HQY0&callback=initMap"></script>
+            <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDzgnI2Ucv622CRkWwo2GE5JRrs_Y4HQY0&callback=initMap" async defer></script>
             </body>
 </html>

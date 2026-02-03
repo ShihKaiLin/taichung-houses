@@ -681,64 +681,70 @@ class SKL_Agency:
                 var markers = [];
                 var infoWindow;
                 
+                // 初始化地圖函數（暴露到 window 供 Google Maps callback 使用）
                 window.initMap = function() {{
-                    map = new google.maps.Map(document.getElementById('map'), {{ 
-                        center: {{lat:24.162, lng:120.647}}, 
-                        zoom:12, 
-                        disableDefaultUI: false,
-                        zoomControl: true,
-                        mapTypeControl: false,
-                        streetViewControl: false,
-                        fullscreenControl: true,
-                        styles: [
-                            {{
-                                "featureType": "all",
-                                "elementType": "geometry",
-                                "stylers": [{{"saturation": -20}}]
-                            }},
-                            {{
-                                "featureType": "water",
-                                "elementType": "geometry.fill",
-                                "stylers": [{{"color": "#c8d7d4}}]
-                            }}
-                        ]
-                    }});
-                    
-                    infoWindow = new google.maps.InfoWindow();
-                    const pts = {data};
-                    
-                    pts.forEach((p, index) => {{
-                        // 創建自定義藍色圓形標記，帶房屋圖示
-                        const marker = new google.maps.Marker({{ 
-                            position: {{lat: parseFloat(p.lat), lng: parseFloat(p.lng)}}, 
-                            map: map,
-                            icon: {{
-                                path: google.maps.SymbolPath.CIRCLE,
-                                scale: 12,
-                                fillColor: '#2196F3',
-                                fillOpacity: 1,
-                                strokeColor: '#FFFFFF',
-                                strokeWeight: 3
-                            }},
-                            title: p.name,
-                            animation: google.maps.Animation.DROP
+                    if (typeof google !== 'undefined' && typeof google.maps !== 'undefined') {{
+                        // 初始化地圖
+                        map = new google.maps.Map(document.getElementById('map'), {{ 
+                            center: {{lat:24.162, lng:120.647}}, 
+                            zoom:12, 
+                            disableDefaultUI: false,
+                            zoomControl: true,
+                            mapTypeControl: false,
+                            streetViewControl: false,
+                            fullscreenControl: true,
+                            styles: [
+                                {{
+                                    "featureType": "all",
+                                    "elementType": "geometry",
+                                    "stylers": [{{"saturation": -20}}]
+                                }},
+                                {{
+                                    "featureType": "water",
+                                    "elementType": "geometry.fill",
+                                    "stylers": [{{"color": "#c8d7d4"}}]
+                                }}
+                            ]
                         }});
                         
-                        marker.addListener('click', () => {{ 
-                            infoWindow.setContent(`
-                                <div style="padding:15px;width:220px;font-family:'Noto Sans TC',sans-serif;">
-                                    <img src="${{p.img}}" style="width:100%;border-radius:8px;margin-bottom:10px;" alt="${{p.name}}">
-                                    <h4 style="margin:8px 0;font-size:16px;color:#1A1A1A;font-weight:700;">${{p.name}}</h4>
-                                    <div style="font-size:22px;font-weight:900;color:#4CAF50;margin:8px 0;">${{p.price}}萬</div>
-                                    <a href="${{p.url}}" style="display:inline-block;margin-top:10px;padding:10px 20px;background:#4CAF50;color:#fff;text-decoration:none;border-radius:8px;font-size:14px;font-weight:700;">查看詳情</a>
-                                </div>
-                            `); 
-                            infoWindow.open(map, marker); 
-                        }});
+                        infoWindow = new google.maps.InfoWindow();
+                        const pts = {data};
                         
-                        markers.push(marker);
-                    }});
+                        pts.forEach((p, index) => {{
+                            // 創建自定義藍色圓形標記，帶房屋圖示
+                            const marker = new google.maps.Marker({{ 
+                                position: {{lat: parseFloat(p.lat), lng: parseFloat(p.lng)}}, 
+                                map: map,
+                                icon: {{
+                                    path: google.maps.SymbolPath.CIRCLE,
+                                    scale: 12,
+                                    fillColor: '#2196F3',
+                                    fillOpacity: 1,
+                                    strokeColor: '#FFFFFF',
+                                    strokeWeight: 3
+                                }},
+                                title: p.name,
+                                animation: google.maps.Animation.DROP
+                            }});
+                            
+                            marker.addListener('click', () => {{ 
+                                infoWindow.setContent(`
+                                    <div style="padding:15px;width:220px;font-family:'Noto Sans TC',sans-serif;">
+                                        <img src="${{p.img}}" style="width:100%;border-radius:8px;margin-bottom:10px;" alt="${{p.name}}">
+                                        <h4 style="margin:8px 0;font-size:16px;color:#1A1A1A;font-weight:700;">${{p.name}}</h4>
+                                        <div style="font-size:22px;font-weight:900;color:#4CAF50;margin:8px 0;">${{p.price}}萬</div>
+                                        <a href="${{p.url}}" style="display:inline-block;margin-top:10px;padding:10px 20px;background:#4CAF50;color:#fff;text-decoration:none;border-radius:8px;font-size:14px;font-weight:700;">查看詳情</a>
+                                    </div>
+                                `); 
+                                infoWindow.open(map, marker); 
+                            }});
+                            
+                            markers.push(marker);
+                        }});
+                    }}
                 }}
+                
+
                 
                 // 篩選功能
                 window.filterProperties = function() {{
@@ -773,7 +779,7 @@ class SKL_Agency:
                     }});
                 }}
             </script>
-            <script src="https://maps.googleapis.com/maps/api/js?key={MAP_KEY}&callback=initMap"></script>
+            <script src="https://maps.googleapis.com/maps/api/js?key={MAP_KEY}&callback=initMap" async defer></script>
             """
         
         return f"""<!DOCTYPE html>

@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    
+    <!-- SEO 優化 -->
+    <title id="page-title">物件詳情 | SK-L 大台中地產戰略</title>
+    <meta name="description" id="page-description" content="查看台中市優質房產物件詳情">
+    <meta name="keywords" content="台中房地產,台中買房,台中建案,台中房屋">
+    
+    <!-- Open Graph -->
+    <meta property="og:type" content="product">
+    <meta property="og:title" id="og-title" content="物件詳情 | SK-L 大台中地產戰略">
+    <meta property="og:description" id="og-description" content="查看台中市優質房產物件詳情">
+    <meta property="og:url" id="og-url" content="">
+    <meta property="og:image" id="og-image" content="">
+    
+    <!-- Schema.org -->
+    <script type="application/ld+json" id="schema-json">
+    {
+      "@context": "https://schema.org",
+      "@type": "RealEstateListing",
+      "name": "",
+      "description": "",
+      "url": "",
+      "image": [],
+      "offers": {
+        "@type": "Offer",
+        "price": "",
+        "priceCurrency": "TWD"
+      },
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "",
+        "addressCountry": "TW"
+      }
+    }
+    </script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': {
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        'forest': {
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    
+    <!-- GLightbox (燈箱效果) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+        
+        /* 圖片縮圖 hover 效果 */
+        .thumbnail {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .thumbnail:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .thumbnail.active {
+            border: 3px solid #16a34a;
+        }
+        
+        /* 固定聯絡卡片 */
+        .sticky-contact {
+            position: sticky;
+            top: 100px;
+        }
+        
+        /* 手機版固定底部聯絡按鈕 */
+        .mobile-contact-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            background: white;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+            padding: 12px 16px;
+        }
+        
+        @media (min-width: 768px) {
+            .mobile-contact-footer {
+                display: none;
+            }
+        }
+        
+        /* 標籤樣式 */
+        .tag {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .tag-primary {
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+        
+        .tag-success {
+            background: #dcfce7;
+            color: #15803d;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    
+    <!-- 導航欄 -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-primary-900 shadow-lg">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <a href="./index.html" class="flex items-center space-x-3 group">
+                    <i class="fas fa-building text-2xl text-white group-hover:text-forest-500 transition-colors"></i>
+                    <span class="text-xl font-bold text-white tracking-wider group-hover:text-forest-500 transition-colors">
+                        SK-L REAL ESTATE
+                    </span>
+                </a>
+                
+                <a href="./index.html" class="text-white hover:text-forest-500 transition-colors font-medium">
+                    <i class="fas fa-arrow-left mr-2"></i>返回列表
+                </a>
+            </div>
+        </nav>
+    </header>
+    
+    <!-- 主要內容 -->
+    <main class="pt-20 pb-32 md:pb-8">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                <!-- 左側：圖片與詳情 (70%) -->
+                <div class="lg:col-span-2 space-y-6">
+                    
+                    <!-- 物件標題與標籤 -->
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <div class="mb-4">
+                            <div id="property-tags" class="mb-3">
+                                <!-- 標籤將由 JavaScript 動態生成 -->
+                            </div>
+                            <h1 id="property-name" class="text-3xl sm:text-4xl font-black text-gray-900 mb-3">
+                                載入中...
+                            </h1>
+                            <div class="flex items-center text-gray-600 mb-4">
+                                <i class="fas fa-map-marker-alt mr-2"></i>
+                                <span id="property-address">載入中...</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-baseline">
+                            <span class="text-5xl font-black text-red-600" id="property-price">-</span>
+                            <span class="text-2xl text-gray-600 ml-2">萬元</span>
+                        </div>
+                    </div>
+                    
+                    <!-- 圖片展示區 -->
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h2 class="text-2xl font-bold text-gray-900 mb-4">
+                            <i class="fas fa-images mr-2 text-forest-600"></i>物件照片
+                        </h2>
+                        
+                        <!-- 主圖 -->
+                        <div class="mb-4">
+                            <img id="main-image" 
+                                 src="https://via.placeholder.com/800x600?text=Loading..." 
+                                 alt="主圖" 
+                                 class="w-full h-[400px] sm:h-[500px] object-cover rounded-lg shadow-lg cursor-pointer"
+                                 onclick="openLightbox(0)">
+                        </div>
+                        
+                        <!-- 縮圖列 -->
+                        <div id="thumbnails" class="grid grid-cols-3 gap-4">
+                            <!-- 縮圖將由 JavaScript 動態生成 -->
+                        </div>
+                    </div>
+                    
+                    <!-- 物件詳情 -->
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h2 class="text-2xl font-bold text-gray-900 mb-4">
+                            <i class="fas fa-info-circle mr-2 text-forest-600"></i>物件詳情
+                        </h2>
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-start">
+                                <i class="fas fa-home text-gray-400 mt-1 mr-3"></i>
+                                <div>
+                                    <div class="text-sm text-gray-500">房屋特色</div>
+                                    <div id="property-features" class="text-gray-900 font-medium">載入中...</div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <i class="fas fa-map-pin text-gray-400 mt-1 mr-3"></i>
+                                <div>
+                                    <div class="text-sm text-gray-500">行政區</div>
+                                    <div id="property-district" class="text-gray-900 font-medium">載入中...</div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <i class="fas fa-clock text-gray-400 mt-1 mr-3"></i>
+                                <div>
+                                    <div class="text-sm text-gray-500">最後更新</div>
+                                    <div id="property-updated" class="text-gray-900 font-medium">載入中...</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 pt-6 border-t border-gray-200">
+                            <a id="original-link" href="#" target="_blank" rel="noopener noreferrer" 
+                               class="inline-block bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg font-bold transition-all">
+                                <i class="fas fa-external-link-alt mr-2"></i>查看原始物件頁面
+                            </a>
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <!-- 右側：固定聯絡卡片 (30%) -->
+                <div class="lg:col-span-1">
+                    <div class="sticky-contact bg-white rounded-xl shadow-xl p-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4 text-center">
+                            <i class="fas fa-user-tie mr-2 text-forest-600"></i>聯絡經紀人
+                        </h3>
+                        
+                        <!-- 經紀人頭像 -->
+                        <div class="flex justify-center mb-4">
+                            <div class="w-24 h-24 bg-gradient-to-br from-forest-600 to-forest-800 rounded-full flex items-center justify-center text-white text-3xl font-bold shadow-lg">
+                                <i class="fas fa-user"></i>
+                            </div>
+                        </div>
+                        
+                        <!-- 經紀人資訊 -->
+                        <div class="text-center mb-6">
+                            <div id="agent-name" class="text-2xl font-bold text-gray-900 mb-1">載入中...</div>
+                            <div class="text-gray-600">大台中房產置產顧問</div>
+                        </div>
+                        
+                        <!-- 聯絡按鈕 -->
+                        <div class="space-y-3">
+                            <a id="agent-line" href="#" target="_blank" rel="noopener noreferrer"
+                               class="block bg-[#06C755] hover:bg-[#05b34c] text-white text-center px-6 py-4 rounded-lg font-bold transition-all shadow-lg hover:shadow-xl transform hover:scale-105">
+                                <i class="fab fa-line text-2xl mr-2"></i>
+                                <span class="text-lg">加 LINE 諮詢</span>
+                            </a>
+                            
+                            <a id="agent-phone" href="#"
+                               class="block bg-forest-600 hover:bg-forest-700 text-white text-center px-6 py-4 rounded-lg font-bold transition-all shadow-lg hover:shadow-xl transform hover:scale-105">
+                                <i class="fas fa-phone text-xl mr-2"></i>
+                                <span class="text-lg" id="phone-number">載入中...</span>
+                            </a>
+                        </div>
+                        
+                        <!-- 服務說明 -->
+                        <div class="mt-6 pt-6 border-t border-gray-200 text-sm text-gray-600 text-center">
+                            <i class="fas fa-shield-alt mr-1 text-forest-600"></i>
+                            專業服務 · 誠信保證
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </main>
+    
+    <!-- 手機版固定底部聯絡按鈕 -->
+    <div class="mobile-contact-footer md:hidden">
+        <div class="flex gap-3">
+            <a id="mobile-line" href="#" target="_blank" rel="noopener noreferrer"
+               class="flex-1 bg-[#06C755] hover:bg-[#05b34c] text-white text-center py-3 rounded-lg font-bold transition-all">
+                <i class="fab fa-line mr-2"></i>LINE
+            </a>
+            <a id="mobile-phone" href="#"
+               class="flex-1 bg-forest-600 hover:bg-forest-700 text-white text-center py-3 rounded-lg font-bold transition-all">
+                <i class="fas fa-phone mr-2"></i>撥打電話
+            </a>
+        </div>
+    </div>
+    
+    <!-- JavaScript -->
+    <script src="./js/property-detail.js"></script>
+    
+</body>
+</html>

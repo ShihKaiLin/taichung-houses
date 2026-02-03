@@ -676,13 +676,12 @@ class SKL_Agency:
         if is_home:
             data = json.dumps(self.points, ensure_ascii=False)
             map_js = f"""
-            <script src="https://maps.googleapis.com/maps/api/js?key={MAP_KEY}&callback=initMap" async defer></script>
             <script>
-                let map;
-                let markers = [];
-                let infoWindow;
+                var map;
+                var markers = [];
+                var infoWindow;
                 
-                function initMap() {{
+                window.initMap = function() {{
                     map = new google.maps.Map(document.getElementById('map'), {{ 
                         center: {{lat:24.162, lng:120.647}}, 
                         zoom:12, 
@@ -742,7 +741,7 @@ class SKL_Agency:
                 }}
                 
                 // 篩選功能
-                function filterProperties() {{
+                window.filterProperties = function() {{
                     const area = document.getElementById('filter-area').value;
                     const type = document.getElementById('filter-type').value;
                     const rooms = document.getElementById('filter-rooms').value;
@@ -774,6 +773,7 @@ class SKL_Agency:
                     }});
                 }}
             </script>
+            <script src="https://maps.googleapis.com/maps/api/js?key={MAP_KEY}&callback=initMap"></script>
             """
         
         return f"""<!DOCTYPE html>
@@ -784,9 +784,8 @@ class SKL_Agency:
     <title>{esc(title)}</title>
     <meta name='description' content='SK-L 大台中地產戰略 - 專業房產置產顧問，為您提供台中精華區優質物件'>
     {CSS}
-    {map_js}
 </head>
-<body>{body}</body>
+<body>{body}{map_js}</body>
 </html>"""
 
     def run(self):
@@ -826,16 +825,37 @@ class SKL_Agency:
             if prop_type:
                 self.types.add(prop_type)
             
-            # 加入地圖標記
-            if r.get("lat") and r.get("lng"): 
+            # 加入地圖標記（使用區域預設座標）
+            # 台中市各區中心點座標
+            area_coords = {
+                "北屯區": {"lat": 24.1810, "lng": 120.7417},
+                "南區": {"lat": 24.1005, "lng": 120.6634},
+                "南屯區": {"lat": 24.1397, "lng": 120.6178},
+                "大里區": {"lat": 24.0990, "lng": 120.6773},
+                "西屯區": {"lat": 24.1816, "lng": 120.6194},
+                "西區": {"lat": 24.1392, "lng": 120.6736},
+                "沙鹿區": {"lat": 24.2259, "lng": 120.5686},
+                "豐原區": {"lat": 24.2567, "lng": 120.7233},
+                "中區": {"lat": 24.1439, "lng": 120.6820},
+                "東區": {"lat": 24.1373, "lng": 120.7038}
+            }
+            
+            if area and area in area_coords:
+                # 加入小随機偏移以避免所有標記重疊
+                import random
+                offset_lat = random.uniform(-0.01, 0.01)
+                offset_lng = random.uniform(-0.01, 0.01)
                 self.points.append({
                     "name": name, 
                     "price": r.get("價格", ""), 
                     "img": img, 
                     "url": url, 
-                    "lat": r["lat"], 
-                    "lng": r["lng"]
+                    "lat": area_coords[area]["lat"] + offset_lat, 
+                    "lng": area_coords[area]["lng"] + offset_lng
                 })
+                print(f"✅ {name}: {area} 區域座標")
+            else:
+                print(f"⚠️  {name}: 無法定位（區域: {area}）")
             
             # 建立詳細頁面
             detail = f"""

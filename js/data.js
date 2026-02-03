@@ -4,7 +4,7 @@
  */
 
 // Google Sheets CSV 連結（請替換為您的試算表連結）
-const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQShAl0-TbUU0MQdYVe53im2T6lXQgh_7g-bdL6HHpIBFtA2yfIAMbPw4J9RgZUkROb9AAiMhnRC0kH/pub?output=csv';
+const SHEET_CSV_URL = https://docs.google.com/spreadsheets/d/e/2PACX-1vRYBDTAMWHLDog00XQiY0MNxZkQxO2gWXEl2TW_7fKpkRWi3iNzVZAlpO6JOPZM1_UCRxi_Twcc3PS-/pub?output=csv
 
 // 全域變數
 let allProperties = [];
